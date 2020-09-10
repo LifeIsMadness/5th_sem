@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/ACS_LAB1/.vs/ACS_LAB1/v16
+/ACS_LAB1/ACS_LAB1/Debug/ACS_LAB1.tlog
+/ACS_LAB1/Debug
+/ACS_LAB1/ACS_LAB1.sln

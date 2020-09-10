@@ -1,0 +1,3 @@
+﻿  LAB1.cpp
+C:\Users\vlad-\Downloads\LAB1.cpp(62): warning C4799: function 'mmx_func' has no EMMS instruction
+  ACS_LAB1.vcxproj -> D:\5th_sem\ACS_LAB1\Debug\ACS_LAB1.exe
