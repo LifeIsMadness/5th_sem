@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <mutex>
-#include <thread>
 #include <atomic>
 #include <chrono>
 #include <queue>
@@ -16,10 +15,17 @@ public:
 class ThreadSafeQueue: public IQueue
 {
 private:
-	std::queue<uint16_t> rawQueue;
+	std::queue<uint8_t> rawQueue;
 	std::mutex queueMutex;
 
 public:
+	ThreadSafeQueue()
+	{
+		rawQueue.push(1);
+		rawQueue.push(2);
+		rawQueue.push(3);
+	}
+
 
 	void push(uint8_t val)
 	{
@@ -30,6 +36,20 @@ public:
 
 	bool pop(uint8_t &val)
 	{
+		if (rawQueue.empty())
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
 
+		std::lock_guard<std::mutex> lock(queueMutex);
+		if (!rawQueue.empty())
+		{
+			val = rawQueue.front();
+			rawQueue.pop();
+			//queueMutex.unlock();
+			return true;
+		}
+		//queueMutex.unlock();
+		return false;
 	}
 };

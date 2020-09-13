@@ -7,12 +7,9 @@
 
 using namespace std;
 
-
-
 class ThreadSafeArrayIncrementer
 {
 private:
-
 	int numTasks = 300;
 	int g_index = 0;
 	mutex g_index_mutex;
