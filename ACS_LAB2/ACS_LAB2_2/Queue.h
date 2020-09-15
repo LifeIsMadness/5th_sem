@@ -19,12 +19,12 @@ private:
 	std::mutex queueMutex;
 
 public:
-	ThreadSafeQueue()
-	{
-		rawQueue.push(1);
-		rawQueue.push(2);
-		rawQueue.push(3);
-	}
+	//ThreadSafeQueue()
+	//{
+	//	rawQueue.push(1);
+	//	rawQueue.push(2);
+	//	rawQueue.push(3);
+	//}
 
 
 	void push(uint8_t val)

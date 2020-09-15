@@ -15,11 +15,11 @@ private:
 	mutex g_index_mutex;
 	atomic_int a_index = 0;
 
-	_int8 *mas = NULL;
+	uint8_t *mas = NULL;
 
 	void initialize(int numTasks)
 	{
-		mas = new _int8[numTasks];
+		mas = new uint8_t[numTasks];
 		for (int i = 0; i < numTasks; i++) mas[i] = 0;
 	}
 
@@ -29,16 +29,13 @@ private:
 		
 		while (g_index < numTasks)
 		{
-
 			g_index_mutex.lock();
 			//std::cout << std::this_thread::get_id() << '\n';
-	
-			
 			if (g_index < numTasks)
 			{
 				mas[g_index]++;
 				g_index_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+				//std::this_thread::sleep_for(std::chrono::nanoseconds(10));
 			}
 			else
 			{
@@ -59,7 +56,7 @@ private:
 			if (a_index < numTasks)
 			{
 				mas[a_index]++;
-				std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+				//std::this_thread::sleep_for(std::chrono::nanoseconds(10));
 			}
 			else break;
 			a_index++;
@@ -88,15 +85,7 @@ public:
 			threads[i] = thread(&ThreadSafeArrayIncrementer::task_mutex, this);
 		}
 
-		auto begin = std::chrono::steady_clock::now();
-		for (size_t i = 0; i < numThreads; i++)
-		{
-			threads[i].join();
-		}	
-		auto end = std::chrono::steady_clock::now();
-
-		auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-		std::cout << "The time: " << elapsed_ms.count() << " ms\n";
+		getExecutionTime(numThreads, threads);
 		
 		//showArray();
 		delete[] threads;
@@ -105,11 +94,18 @@ public:
 	void run_threads_atomic(size_t numThreads = 2)
 	{
 		thread* threads = new thread[numThreads];
-
 		for (size_t i = 0; i < numThreads; i++)
 		{
 			threads[i] = thread(&ThreadSafeArrayIncrementer::task_atomic, this);
 		}
+
+		getExecutionTime(numThreads, threads);
+		//showArray();
+		delete[] threads;
+	}
+
+	void getExecutionTime(const size_t& numThreads, std::thread* threads)
+	{
 		auto begin = std::chrono::steady_clock::now();
 		for (size_t i = 0; i < numThreads; i++)
 		{
@@ -119,7 +115,6 @@ public:
 
 		auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 		std::cout << "The time: " << elapsed_ms.count() << " ms\n";
-		//showArray();
 	}
 
 	void showArray()
