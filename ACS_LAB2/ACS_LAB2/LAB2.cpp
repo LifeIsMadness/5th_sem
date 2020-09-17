@@ -4,6 +4,7 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+#include <vector>
 
 using namespace std;
 
@@ -13,14 +14,13 @@ private:
 	int numTasks = 300;
 	int g_index = 0;
 	mutex g_index_mutex;
-	atomic_int a_index = 0;
+	atomic_int a_index = { 0 };
 
-	uint8_t *mas = NULL;
+	vector<uint8_t> mas;
 
 	void initialize(int numTasks)
 	{
-		mas = new uint8_t[numTasks];
-		for (int i = 0; i < numTasks; i++) mas[i] = 0;
+		mas = vector<uint8_t>(numTasks, 0);
 	}
 
 	void task_mutex()
@@ -33,7 +33,8 @@ private:
 			//std::cout << std::this_thread::get_id() << '\n';
 			if (g_index < numTasks)
 			{
-				mas[g_index]++;
+				mas.at(g_index)++;
+				g_index++;
 				g_index_mutex.unlock();
 				//std::this_thread::sleep_for(std::chrono::nanoseconds(10));
 			}
@@ -42,7 +43,6 @@ private:
 				g_index_mutex.unlock();
 				break;
 			}
-			g_index++;
 			
 		}
 		
@@ -50,16 +50,18 @@ private:
 
 	void task_atomic()
 	{
-		while (a_index < numTasks)
+
+		while (true)
 		{
+			auto currentIndex = a_index.load();
 			//std::cout << std::this_thread::get_id() << '\n';
-			if (a_index < numTasks)
+			if (a_index.fetch_add(1) < numTasks)
 			{
-				mas[a_index]++;
+				mas.at(currentIndex)++;
 				//std::this_thread::sleep_for(std::chrono::nanoseconds(10));
 			}
 			else break;
-			a_index++;
+			
 		}
 	}
 
@@ -73,7 +75,6 @@ public:
 
 	~ThreadSafeArrayIncrementer()
 	{
-		delete [] mas;
 	}
 
 	void run_threads_mutex(size_t numThreads = 2)
