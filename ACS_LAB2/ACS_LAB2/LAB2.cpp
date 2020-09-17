@@ -53,11 +53,11 @@ private:
 
 		while (true)
 		{
-			auto currentIndex = a_index.load();
+			auto index = a_index.fetch_add(1);
 			//std::cout << std::this_thread::get_id() << '\n';
-			if (a_index.fetch_add(1) < numTasks)
+			if (index < numTasks)
 			{
-				mas.at(currentIndex)++;
+				mas.at(index)++;
 				//std::this_thread::sleep_for(std::chrono::nanoseconds(10));
 			}
 			else break;
