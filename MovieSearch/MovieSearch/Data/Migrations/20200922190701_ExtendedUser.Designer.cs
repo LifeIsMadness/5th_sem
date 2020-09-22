@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieSearch.Data;
 
 namespace MovieSearch.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200922190701_ExtendedUser")]
+    partial class ExtendedUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,22 +281,25 @@ namespace MovieSearch.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("MovieId")
+                    b.Property<int>("ApplicationUserId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("ApplicationUserId1")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Value")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApplicationUserId1");
+
                     b.HasIndex("MovieId");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("MovieMarks");
+                    b.ToTable("MovieMark");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -359,15 +364,15 @@ namespace MovieSearch.Data.Migrations
 
             modelBuilder.Entity("MovieSearch.Models.MovieMark", b =>
                 {
+                    b.HasOne("MovieSearch.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Marks")
+                        .HasForeignKey("ApplicationUserId1");
+
                     b.HasOne("MovieSearch.Models.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("MovieSearch.Models.ApplicationUser", "User")
-                        .WithMany("Marks")
-                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

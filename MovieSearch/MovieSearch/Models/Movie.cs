@@ -11,6 +11,8 @@ namespace MovieSearch.Models
 
         public string Name { get; set; }
 
+        public string Image { get; set; }
+
         public string Title { get; set; }
 
         public int Year { get; set; }
@@ -22,5 +24,7 @@ namespace MovieSearch.Models
         public int GenreId { get; set; }
 
         public MovieGenre Genre { get; set; }
+
+        public List<MovieMark> MovieMarks { get; set; }
     }
 }
