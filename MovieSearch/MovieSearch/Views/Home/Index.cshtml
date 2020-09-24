@@ -19,9 +19,6 @@
                 @Html.DisplayNameFor(model => model.Image)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Year)
             </th>
             <th>
@@ -47,9 +44,6 @@
                     @Html.DisplayFor(modelItem => item.Image)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => item.Year)
                 </td>
                 <td>
@@ -62,9 +56,7 @@
                     @Html.DisplayFor(modelItem => item.Genre.Name)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
                 </td>
             </tr>
         }
