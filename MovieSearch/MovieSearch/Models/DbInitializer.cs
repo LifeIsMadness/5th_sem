@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MovieSearch.Data;
 using System;
@@ -15,6 +17,9 @@ namespace MovieSearch.Models
             using (var dbContext = new ApplicationDbContext(
                 serviceProvider.GetRequiredService<
                     DbContextOptions<ApplicationDbContext>>()))
+            using(var userManager = 
+                serviceProvider.GetRequiredService<
+                    UserManager<ApplicationUser>>())
             {
                 if (!dbContext.Movies.Any())
                 {
@@ -34,7 +39,13 @@ namespace MovieSearch.Models
 
                     );
                 }
+                else 
+                if (!dbContext.Roles.Any(r => r.Name == "Admin"))
+                {
+                    dbContext.Roles.Add(new IdentityRole { Name = "Admin" });
+                }
                 else return;
+
                 dbContext.SaveChanges();
             }
 

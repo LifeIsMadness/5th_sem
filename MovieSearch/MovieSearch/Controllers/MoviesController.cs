@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,19 +17,33 @@ namespace MovieSearch.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<MoviesController> _logger;
 
-        public MoviesController(ILogger<HomeController> logger, ApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public MoviesController(
+            ILogger<MoviesController> logger,
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Movies
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Movies.Include(m => m.Genre);
-            return View(await applicationDbContext.ToListAsync());
+            //var user = await _userManager.GetUserAsync(this.User);
+
+            //if(user != null)
+            //{
+                
+            //}
+
+            var movies = _context.Movies.Include(m => m.Genre);
+
+            return View(await movies.ToListAsync());
         }
 
         // GET: Movies/Details/5
@@ -39,6 +54,8 @@ namespace MovieSearch.Controllers
                 return NotFound();
             }
 
+
+
             var movie = await _context.Movies
                 .Include(m => m.Genre)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -47,12 +64,19 @@ namespace MovieSearch.Controllers
                 return NotFound();
             }
 
+            var userId =  _userManager.GetUserId(User);
+            var user = _userManager.Users.Include(u => u.Marks).FirstOrDefault(u => u.Id == userId);
+            if (user != null)
+            {
+                ViewData["MovieMarkValue"] = user.Marks.FirstOrDefault(m => m.Movie.Id == movie.Id)?.Value;
+            }
+
             return View(movie);
         }
 
         // GET: Movies/Create
         // Only admin can create new db record. 
-        // [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Id");
@@ -64,7 +88,8 @@ namespace MovieSearch.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Image,Title,Year,Country,OveralRating,GenreId")] Movie movie)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([Bind("Id,Name,Image,Title,Year,Country,GenreId")] Movie movie)
         {
             if (ModelState.IsValid)
             {
@@ -77,6 +102,7 @@ namespace MovieSearch.Controllers
         }
 
         // GET: Movies/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -98,7 +124,8 @@ namespace MovieSearch.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Image,Title,Year,Country,OveralRating,GenreId")] Movie movie)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Image,Title,Year,Country,GenreId")] Movie movie)
         {
             if (id != movie.Id)
             {
@@ -130,6 +157,7 @@ namespace MovieSearch.Controllers
         }
 
         // GET: Movies/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -144,13 +172,14 @@ namespace MovieSearch.Controllers
             {
                 return NotFound();
             }
-
+            
             return View(movie);
         }
 
         // POST: Movies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var movie = await _context.Movies.FindAsync(id);
@@ -158,6 +187,24 @@ namespace MovieSearch.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Vote(int id, int value)
+        //{
+        //    var movie = await _context.Movies.FindAsync(id);
+        //    if (movie == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var user = await _userManager.GetUserAsync(User);
+
+        //    _context.MovieMarks.Add(new MovieMark() { Value = value, Movie = movie, User = user});
+        //    await _context.SaveChangesAsync();
+
+        //    return RedirectToAction(nameof(Details), new { id = id });
+        //}
 
         private bool MovieExists(int id)
         {

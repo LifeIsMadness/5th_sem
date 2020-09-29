@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,6 +21,7 @@ namespace MovieSearch.Models
 
         public string Country { get; set; }
 
+        [DefaultValue(0.0)]
         public float OveralRating { get; set; }
 
         public int GenreId { get; set; }

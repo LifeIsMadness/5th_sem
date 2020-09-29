@@ -12,7 +12,5 @@ namespace MovieSearch.Models
 
         public int MoviesViewedCount { get; set; }
 
-        public bool IsAdmin { get; set; }
-
     }
 }
