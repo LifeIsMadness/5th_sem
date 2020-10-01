@@ -90,7 +90,6 @@ namespace MovieSearch.Controllers
             { movie.OveralRating += mark.Value / count;}
 
             _context.Movies.Update(movie);
-            await _context.SaveChangesAsync();
         }
     }
 }

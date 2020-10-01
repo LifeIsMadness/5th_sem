@@ -10,6 +10,8 @@ namespace MovieSearch.Models
     {  
         public List<MovieMark> Marks { get; set; }
 
+        public List<Review> Reviews { get; set; }
+
         public int MoviesViewedCount { get; set; }
 
     }

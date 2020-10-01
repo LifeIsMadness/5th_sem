@@ -1,4 +1,0 @@
-﻿  LAB1.cpp
-D:\5th_sem\ACS_LAB1\ACS_LAB1\LAB1.cpp(18,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-D:\5th_sem\ACS_LAB1\ACS_LAB1\LAB1.cpp(66): warning C4799: function 'mmx_func' has no EMMS instruction
-  ACS_LAB1.vcxproj -> D:\5th_sem\ACS_LAB1\Debug\ACS_LAB1.exe

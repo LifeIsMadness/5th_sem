@@ -6,10 +6,25 @@
 
 <h1>Index</h1>
 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-{   <p>
+{<p>
         <a asp-action="Create">Create New</a>
     </p>
 }
+
+<form asp-action="Index" method="get">
+    <p>
+        <select name="genreId" asp-items="ViewBag.Genres">
+            <option value="">All</option>
+        </select>
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+<form asp-action="IndexSearch" method="get">
+    <p>
+        <input type="search" value="@Context.Request.Query["searchValue"]" name="searchValue" />
+        <input type="submit" value="Search" />
+    </p>
+</form>
 
 <table class="table">
     <thead>
@@ -55,7 +70,7 @@
                     @Html.DisplayFor(modelItem => item.OveralRating)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Genre.Id)
+                    @Html.DisplayFor(modelItem => item.Genre.Name)
                 </td>
 
                 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))

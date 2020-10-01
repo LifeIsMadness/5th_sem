@@ -32,18 +32,40 @@ namespace MovieSearch.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int genreId = 0)
         {
-            //var user = await _userManager.GetUserAsync(this.User);
+            IQueryable<Movie> movies;
+            if (genreId > 0)
+            {
+                movies = _context.Movies.Include(m => m.Genre).Where(m => m.GenreId == genreId);
+                if (movies == null)
+                    return NotFound();
 
-            //if(user != null)
-            //{
-                
-            //}
-
-            var movies = _context.Movies.Include(m => m.Genre);
-
+                var genre = await _context.MovieGenres.FindAsync(genreId);
+                ViewData["Genres"] = new SelectList(_context.MovieGenres, "Id", "Name", genre.Id);
+      
+            }
+            else
+            {
+                movies = _context.Movies.Include(m => m.Genre);
+                ViewData["Genres"] = new SelectList(_context.MovieGenres, "Id", "Name");
+            }
+            
             return View(await movies.ToListAsync());
+        }
+
+        public async Task<IActionResult> IndexSearch(string searchValue)
+        {
+            IQueryable<Movie> movies = _context.Movies.Include(m => m.Genre);
+
+            if(!string.IsNullOrEmpty(searchValue))
+            {
+                movies = movies.Where(m => m.Name.Contains(searchValue));
+            }
+
+            ViewData["Genres"] = new SelectList(_context.MovieGenres, "Id", "Name");
+         
+            return View("./Index", await movies.ToListAsync());
         }
 
         // GET: Movies/Details/5
@@ -53,8 +75,6 @@ namespace MovieSearch.Controllers
             {
                 return NotFound();
             }
-
-
 
             var movie = await _context.Movies
                 .Include(m => m.Genre)
@@ -75,11 +95,11 @@ namespace MovieSearch.Controllers
         }
 
         // GET: Movies/Create
-        // Only admin can create new db record. 
+        // Only admin can create new a db record. 
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Id");
+            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Name");
             return View();
         }
 
@@ -97,7 +117,9 @@ namespace MovieSearch.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Id", movie.GenreId);
+
+            var genre = await _context.MovieGenres.FindAsync(movie.GenreId);
+            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Name", genre.Name);
             return View(movie);
         }
 
@@ -110,12 +132,12 @@ namespace MovieSearch.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = await _context.Movies.Include(m => m.Genre).FirstOrDefaultAsync(m => m.Id == id);
             if (movie == null)
             {
                 return NotFound();
             }
-            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Id", movie.GenreId);
+            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Name");
             return View(movie);
         }
 
@@ -125,7 +147,7 @@ namespace MovieSearch.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Image,Title,Year,Country,GenreId")] Movie movie)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Image,Title,Year,Country,OveralRating,GenreId")] Movie movie)
         {
             if (id != movie.Id)
             {
@@ -152,7 +174,9 @@ namespace MovieSearch.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Id", movie.GenreId);
+
+            var genre = await _context.MovieGenres.FindAsync(movie.GenreId);
+            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Name", genre.Name);
             return View(movie);
         }
 
@@ -185,26 +209,9 @@ namespace MovieSearch.Controllers
             var movie = await _context.Movies.FindAsync(id);
             _context.Movies.Remove(movie);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Vote(int id, int value)
-        //{
-        //    var movie = await _context.Movies.FindAsync(id);
-        //    if (movie == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var user = await _userManager.GetUserAsync(User);
-
-        //    _context.MovieMarks.Add(new MovieMark() { Value = value, Movie = movie, User = user});
-        //    await _context.SaveChangesAsync();
-
-        //    return RedirectToAction(nameof(Details), new { id = id });
-        //}
 
         private bool MovieExists(int id)
         {

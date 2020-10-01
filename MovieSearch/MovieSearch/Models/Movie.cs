@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -14,7 +15,8 @@ namespace MovieSearch.Models
         public string Name { get; set; }
 
         public string Image { get; set; }
-
+       
+        [Column(TypeName = "NVARCHAR(500)")]
         public string Title { get; set; }
 
         public int Year { get; set; }
