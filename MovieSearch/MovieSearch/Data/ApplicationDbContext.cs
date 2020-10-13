@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MovieSearch.Models;
+using MovieSearch.Models.ExtendedUser;
 
 namespace MovieSearch.Data
 {
@@ -19,5 +20,20 @@ namespace MovieSearch.Data
         public DbSet<MovieGenre> MovieGenres { get; set; }
 
         public DbSet<MovieMark> MovieMarks { get; set; }
+
+        public DbSet<Review> Reviews { get; set; }
+
+        public DbSet<UserMoviesProfile> MoviesProfiles { get; set; }
+
+        public DbSet<FavouriteMovie> FavouriteMovies { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+
+            builder.Entity<UserFavourites>()
+                .HasKey(f => new { f.MovieId, f.ProfileId });
+
+            base.OnModelCreating(builder);
+        }
     }
 }

@@ -10,7 +10,7 @@ using MovieSearch.Data;
 using MovieSearch.Models;
 
 namespace MovieSearch.Controllers
-{
+{ 
     // Controller for the Movie model.
     public class HomeController : Controller
     {

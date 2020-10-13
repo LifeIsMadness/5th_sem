@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MovieSearch.Data;
 using MovieSearch.Models;
+using MovieSearch.ViewModels.Movies;
 
 namespace MovieSearch.Controllers
 {
@@ -35,6 +36,8 @@ namespace MovieSearch.Controllers
         public async Task<IActionResult> Index(int genreId = 0)
         {
             IQueryable<Movie> movies;
+            var viewModel = new MovieIndexViewModel();
+
             if (genreId > 0)
             {
                 movies = _context.Movies.Include(m => m.Genre).Where(m => m.GenreId == genreId);
@@ -42,30 +45,36 @@ namespace MovieSearch.Controllers
                     return NotFound();
 
                 var genre = await _context.MovieGenres.FindAsync(genreId);
-                ViewData["Genres"] = new SelectList(_context.MovieGenres, "Id", "Name", genre.Id);
+                viewModel.Genres = new SelectList(_context.MovieGenres, "Id", "Name", genre.Id);
       
             }
             else
             {
                 movies = _context.Movies.Include(m => m.Genre);
-                ViewData["Genres"] = new SelectList(_context.MovieGenres, "Id", "Name");
+                viewModel.Genres = new SelectList(_context.MovieGenres, "Id", "Name");
             }
-            
-            return View(await movies.ToListAsync());
+
+            viewModel.Movies = await movies.ToListAsync();
+
+            return View(viewModel);
         }
 
         public async Task<IActionResult> IndexSearch(string searchValue)
         {
             IQueryable<Movie> movies = _context.Movies.Include(m => m.Genre);
+            var viewModel = new MovieIndexViewModel();
 
-            if(!string.IsNullOrEmpty(searchValue))
+            if (!string.IsNullOrEmpty(searchValue))
             {
                 movies = movies.Where(m => m.Name.Contains(searchValue));
             }
 
-            ViewData["Genres"] = new SelectList(_context.MovieGenres, "Id", "Name");
-         
-            return View("./Index", await movies.ToListAsync());
+
+            ViewData["SearchValue"] = searchValue;
+            viewModel.Genres = new SelectList(_context.MovieGenres, "Id", "Name");
+            viewModel.Movies = await movies.ToListAsync();
+
+            return View("./Index", viewModel);
         }
 
         // GET: Movies/Details/5
@@ -79,19 +88,30 @@ namespace MovieSearch.Controllers
             var movie = await _context.Movies
                 .Include(m => m.Genre)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (movie == null)
             {
                 return NotFound();
             }
 
-            var userId =  _userManager.GetUserId(User);
-            var user = _userManager.Users.Include(u => u.Marks).FirstOrDefault(u => u.Id == userId);
-            if (user != null)
-            {
-                ViewData["MovieMarkValue"] = user.Marks.FirstOrDefault(m => m.Movie.Id == movie.Id)?.Value;
-            }
+            var userId = _userManager.GetUserId(User);
 
-            return View(movie);
+            var viewModel = new MovieDetailsViewModel { Movie = movie };
+            viewModel.Reviews = await _context.Reviews
+                .AsNoTracking()
+                .Include(r => r.UserProfile)
+                .ToListAsync();
+
+            if (userId != null)
+            {
+                var mark = await _context.MovieMarks
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => 
+                    m.Movie.Id == movie.Id && m.UserProfile.UserId == userId);
+                viewModel.Mark = mark;
+            }
+                
+            return View(viewModel);
         }
 
         // GET: Movies/Create
@@ -137,8 +157,14 @@ namespace MovieSearch.Controllers
             {
                 return NotFound();
             }
-            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Name");
-            return View(movie);
+
+            MovieEditViewModel viewModel = new MovieEditViewModel 
+            {
+                Movie = movie,
+                Genres = new SelectList(_context.MovieGenres, "Id", "Name"),
+            };
+
+            return View(viewModel);
         }
 
         // POST: Movies/Edit/5
@@ -175,9 +201,14 @@ namespace MovieSearch.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            MovieEditViewModel viewModel = new MovieEditViewModel
+            {
+                Movie = movie,
+            };
+
             var genre = await _context.MovieGenres.FindAsync(movie.GenreId);
-            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Name", genre.Name);
-            return View(movie);
+            viewModel.Genres = new SelectList(_context.MovieGenres, "Id", "Name", genre.Name);
+            return View(viewModel);
         }
 
         // GET: Movies/Delete/5
@@ -217,5 +248,6 @@ namespace MovieSearch.Controllers
         {
             return _context.Movies.Any(e => e.Id == id);
         }
+
     }
 }

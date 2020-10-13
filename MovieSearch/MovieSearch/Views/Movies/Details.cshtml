@@ -1,4 +1,4 @@
-﻿@model MovieSearch.Models.Movie
+﻿@model MovieSearch.ViewModels.Movies.MovieDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -11,48 +11,48 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Movie.Name)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Movie.Name)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
+            @Html.DisplayNameFor(model => model.Movie.Image)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Image)
+            @Html.DisplayFor(model => model.Movie.Image)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
+            @Html.DisplayNameFor(model => model.Movie.Title)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
+            @Html.DisplayFor(model => model.Movie.Title)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Year)
+            @Html.DisplayNameFor(model => model.Movie.Year)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Year)
+            @Html.DisplayFor(model => model.Movie.Year)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Country)
+            @Html.DisplayNameFor(model => model.Movie.Country)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Country)
+            @Html.DisplayFor(model => model.Movie.Country)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OveralRating)
+            @Html.DisplayNameFor(model => model.Movie.OveralRating)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OveralRating)
+            @Html.DisplayFor(model => model.Movie.OveralRating)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Genre)
+            @Html.DisplayNameFor(model => model.Movie.Genre)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Genre.Name)
+            @Html.DisplayFor(model => model.Movie.Genre.Name)
         </dd>
-        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+        @if (User.Identity.IsAuthenticated)
         {
             <dt class="col-sm-2">
                 Vote
@@ -60,8 +60,12 @@
             <dd class="col-sm-10">
                 <form asp-action="Vote" asp-controller="Vote">
 
-                    <input type="hidden" asp-for="Id"/>
-                    <input class="form-control" name="value" value="@ViewData["MovieMarkValue"]" />
+                    <input type="hidden" asp-for="Mark.Id" />
+                    <input type="hidden" asp-for="Mark.MovieId" />
+                    <input type="hidden" asp-for="Mark.UserProfileId" />
+                    <input asp-for="Mark.Value" />
+
+                    <!-- <input name="value" value="@ViewData["MovieMarkValue"]" />-->
                     <input type="submit" value="Vote" class="btn btn-primary" />
                 </form>
             </dd>
@@ -71,6 +75,8 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    {<a asp-action="Edit" asp-route-id="@Model.Movie.Id">Edit</a>}
+    |
     <a asp-action="Index">Back to List</a>
 </div>

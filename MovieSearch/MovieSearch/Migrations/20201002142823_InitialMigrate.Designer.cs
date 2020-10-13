@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieSearch.Data;
 
-namespace MovieSearch.Data.Migrations
+namespace MovieSearch.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200922192408_MovieMark1")]
-    partial class MovieMark1
+    [Migration("20201002142823_InitialMigrate")]
+    partial class InitialMigrate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -99,12 +99,10 @@ namespace MovieSearch.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -141,12 +139,10 @@ namespace MovieSearch.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -181,7 +177,7 @@ namespace MovieSearch.Data.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("MoviesViewedCount")
+                    b.Property<int>("MoviesProfileId")
                         .HasColumnType("int");
 
                     b.Property<string>("NormalizedEmail")
@@ -201,6 +197,9 @@ namespace MovieSearch.Data.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<byte[]>("ProfilePicture")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -213,6 +212,8 @@ namespace MovieSearch.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MoviesProfileId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
 
@@ -222,6 +223,24 @@ namespace MovieSearch.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("MovieSearch.Models.ExtendedUser.UserMoviesProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("MoviesViewedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MoviesProfiles");
                 });
 
             modelBuilder.Entity("MovieSearch.Models.Movie", b =>
@@ -247,7 +266,7 @@ namespace MovieSearch.Data.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR(500)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -281,13 +300,10 @@ namespace MovieSearch.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("MovieId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("UserProfileId")
                         .HasColumnType("int");
 
                     b.Property<int>("Value")
@@ -295,11 +311,31 @@ namespace MovieSearch.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
-
                     b.HasIndex("MovieId");
 
+                    b.HasIndex("UserProfileId");
+
                     b.ToTable("MovieMarks");
+                });
+
+            modelBuilder.Entity("MovieSearch.Models.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Content")
+                        .HasColumnType("Text");
+
+                    b.Property<int>("UserProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserProfileId");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -353,6 +389,15 @@ namespace MovieSearch.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MovieSearch.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("MovieSearch.Models.ExtendedUser.UserMoviesProfile", "MoviesProfile")
+                        .WithMany()
+                        .HasForeignKey("MoviesProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MovieSearch.Models.Movie", b =>
                 {
                     b.HasOne("MovieSearch.Models.MovieGenre", "Genre")
@@ -364,13 +409,24 @@ namespace MovieSearch.Data.Migrations
 
             modelBuilder.Entity("MovieSearch.Models.MovieMark", b =>
                 {
-                    b.HasOne("MovieSearch.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Marks")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("MovieSearch.Models.Movie", "Movie")
-                        .WithMany()
+                        .WithMany("MovieMarks")
                         .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MovieSearch.Models.ExtendedUser.UserMoviesProfile", "UserProfile")
+                        .WithMany("Marks")
+                        .HasForeignKey("UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MovieSearch.Models.Review", b =>
+                {
+                    b.HasOne("MovieSearch.Models.ExtendedUser.UserMoviesProfile", "UserProfile")
+                        .WithMany("Reviews")
+                        .HasForeignKey("UserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

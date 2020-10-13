@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MovieSearch.Models.ExtendedUser;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,11 +12,15 @@ namespace MovieSearch.Models
     {
         public int Id { get; set; }
 
+        [Required]
         [Column(TypeName = "Text")]
         public string Content { get; set; }
 
-        public string UserId { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime Date { get; set; }
 
-        public ApplicationUser User { get; set; }
+        public int UserProfileId { get; set; }
+
+        public UserMoviesProfile UserProfile { get; set; }
     }
 }

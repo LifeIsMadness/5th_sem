@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MovieSearch.Models.Movie>
+﻿@model MovieSearch.ViewModels.Movies.MovieIndexViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -13,7 +13,7 @@
 
 <form asp-action="Index" method="get">
     <p>
-        <select name="genreId" asp-items="ViewBag.Genres">
+        <select name="genreId" asp-items="Model.Genres">
             <option value="">All</option>
         </select>
         <input type="submit" value="Filter" />
@@ -21,7 +21,7 @@
 </form>
 <form asp-action="IndexSearch" method="get">
     <p>
-        <input type="search" value="@Context.Request.Query["searchValue"]" name="searchValue" />
+        <input type="search" value="@ViewBag.SearchValue" name="searchValue" />
         <input type="submit" value="Search" />
     </p>
 </form>
@@ -30,28 +30,28 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Image)
+                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Image)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Year)
+                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Year)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Country)
+                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Country)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.OveralRating)
+                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).OveralRating)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Genre)
+                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Genre)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Movies)
         {
         <tr>
             <td>

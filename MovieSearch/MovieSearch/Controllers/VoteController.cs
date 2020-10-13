@@ -5,9 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using MovieSearch.Data;
+using MovieSearch.Migrations;
 using MovieSearch.Models;
+using MovieSearch.Models.ExtendedUser;
 using SQLitePCL;
 
 namespace MovieSearch.Controllers
@@ -38,46 +43,30 @@ namespace MovieSearch.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Vote(int id, int value)
+        public async Task<IActionResult> Vote([Bind("Id,Value,MovieId,UserProfileId")] MovieMark mark)
         {
-            var movie = await _context.Movies.FindAsync(id);
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
             var user = await _userManager.GetUserAsync(User);
 
-            if (!MarkExistsAndReturn(user.Id, movie.Id, out MovieMark existingModel))
-            {
-                _context.MovieMarks.Add(new MovieMark() { Value = value, Movie = movie, User = user });
-                user.MoviesViewedCount++;
-            }
-            else
-            {
-                existingModel.Value = value;
-                _context.MovieMarks.Update(existingModel);
-            }
+            var userProfile = await _context.MoviesProfiles
+                    .FirstOrDefaultAsync(p => p.UserId == user.Id);
 
-            
-            UpdateOveralRating(value, movie.Id);
+            if (!MarkExists(mark.Id))
+            {
+                mark.UserProfileId = userProfile.Id;
+                _context.MovieMarks.Add(mark);
+                userProfile.MoviesViewedCount++;
+            }
+            else _context.MovieMarks.Update(mark);
+
+            UpdateOveralRating(mark.Value, mark.MovieId);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Details", "Movies", new { id = id });
+            return RedirectToAction("Details", "Movies", new { id = mark.MovieId });
         }
-
-        private bool MarkExistsAndReturn(string userId, int movieId, out MovieMark mark)
+       
+        private bool MarkExists(int id)
         {
-            if (_context.MovieMarks.Any(m => m.UserId == userId && m.MovieId == movieId))
-            {
-                mark = _context.MovieMarks.FirstOrDefault(m => m.UserId == userId && m.MovieId == movieId);
-                return true;
-            }
-            else
-            {
-                mark = null;
-                return false;
-            }
+            return _context.MovieMarks.Any(m => m.Id == id);
         }
 
         private async void UpdateOveralRating(int value, int movieId)
@@ -91,5 +80,6 @@ namespace MovieSearch.Controllers
 
             _context.Movies.Update(movie);
         }
+
     }
 }
