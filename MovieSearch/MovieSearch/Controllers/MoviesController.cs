@@ -133,7 +133,7 @@ namespace MovieSearch.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(movie);
+                _context.AddRange(movie, new FavouriteMovie { MovieId = movie.Id });
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

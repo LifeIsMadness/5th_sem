@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace MovieSearch.Models
 {
+    //'Cause movie model has lotsa db dependencies, another one was created for many to many rel.
     public class FavouriteMovie
     {
         public int Id { get; set; }

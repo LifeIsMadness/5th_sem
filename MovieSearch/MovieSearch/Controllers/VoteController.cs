@@ -63,7 +63,33 @@ namespace MovieSearch.Controllers
 
             return RedirectToAction("Details", "Movies", new { id = mark.MovieId });
         }
-       
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddDeleteFavouriteMovie(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var userProfile = await _context.MoviesProfiles
+                    .Include(p => p.FavouriteMovies)
+                    .FirstOrDefaultAsync(p => p.UserId == userId);
+
+            if(!userProfile.FavouriteMovies.Any(m => m.MovieId == id))
+            {
+                userProfile.FavouriteMovies.Add(new UserFavourites { MovieId = id, ProfileId = userProfile.Id });
+            }
+            else
+            {
+                var favMovie = userProfile.FavouriteMovies.FirstOrDefault(m => m.MovieId == id);
+                userProfile.FavouriteMovies.Remove(favMovie);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", "Movies", new { id = id });
+        }
+
         private bool MarkExists(int id)
         {
             return _context.MovieMarks.Any(m => m.Id == id);

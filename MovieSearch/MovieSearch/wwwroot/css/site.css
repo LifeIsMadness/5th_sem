@@ -24,6 +24,12 @@ a {
   border-color: #1861ac;
 }
 
+.nav-pills-o .nav-link.active, nav-pills-o .show > .nav-link {
+    color: #fff;
+    background-color: #f68d43;
+    border-color: #1861ac;
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
