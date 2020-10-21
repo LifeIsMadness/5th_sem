@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -108,7 +109,17 @@ namespace MovieSearch.Controllers
                     .AsNoTracking()
                     .FirstOrDefaultAsync(m => 
                     m.Movie.Id == movie.Id && m.UserProfile.UserId == userId);
+
+                var favMovie = await _context.FavouriteMovies
+                    .Include(f => f.UserProfiles)
+                    .ThenInclude(f => f.Profile)
+                    .FirstOrDefaultAsync(f => f.MovieId == movie.Id);
+
+                var isFavourite = favMovie.UserProfiles.Any(f => f.Profile.UserId == userId);
+                    
                 viewModel.Mark = mark;
+                if(isFavourite) viewModel.IsFavourite = "In Favourites";
+                else viewModel.IsFavourite = "Add Favourite";
             }
                 
             return View(viewModel);
@@ -133,7 +144,7 @@ namespace MovieSearch.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.AddRange(movie, new FavouriteMovie { MovieId = movie.Id });
+                _context.AddRange(movie, new FavouriteMovie { Movie = movie});
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

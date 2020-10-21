@@ -66,10 +66,11 @@ namespace MovieSearch
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "default",
+                    name: "movies",
                     pattern: "{controller=Movies}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+            
         }
     }
 }

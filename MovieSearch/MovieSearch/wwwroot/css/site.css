@@ -1,6 +1,10 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+body {
+    background: url(/img/bg.jpg);
+}
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -75,3 +79,45 @@ body {
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
 }
+
+.div-m {
+    margin: 0 auto;
+    width: 460px;
+}
+
+.div-m form {    
+    margin: 10px 5px 10px 10px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.index-film-rating{
+    color: #1861ac;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 2px;
+}
+
+.button-search {
+    top: 0;
+    right: 0px;
+    width: 42px;
+    height: 42px;
+    border: none;
+    background: #7BA7AB;
+    border-radius: 0px, 5px, 5px, 0px;
+    cursor: pointer;
+}
+
+.button-search::before {
+    content: "\f002";
+    font-family: FontAwesome;
+    font-size: 16px;
+    color: #F9F0DA;
+}
+
+
+

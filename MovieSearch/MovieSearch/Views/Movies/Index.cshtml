@@ -3,91 +3,58 @@
 @{
     ViewData["Title"] = "Index";
 }
+<link rel="stylesheet" href="~/css/dropdown.css" />
 
-<h1>Index</h1>
 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
 {<p>
         <a asp-action="Create">Create New</a>
     </p>
 }
+<div class="div-m row">
+    <form asp-action="Index" method="get">
+        <p>
+            <select class="wrapper-dropdown-3" name="genreId" asp-items="Model.Genres" 
+                    onchange="document.location = '/?genreId=' + this.value">
+                <option value="">All</option>
+            </select>
+        </p>
+    </form>
+    <form asp-action="IndexSearch" method="get">
+        <p>
+            <input class="wrapper-dropdown-3-search" type="search" value="@ViewBag.SearchValue" name="searchValue" 
+                   placeholder="Search..." />
+            <button class="button-search" type="submit" value="Search"></button>
+        </p>
+    </form>
+</div>
 
-<form asp-action="Index" method="get">
-    <p>
-        <select name="genreId" asp-items="Model.Genres">
-            <option value="">All</option>
-        </select>
-        <input type="submit" value="Filter" />
-    </p>
-</form>
-<form asp-action="IndexSearch" method="get">
-    <p>
-        <input type="search" value="@ViewBag.SearchValue" name="searchValue" />
-        <input type="submit" value="Search" />
-    </p>
-</form>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Image)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Year)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Country)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).OveralRating)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Movies.ElementAt(0).Genre)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Movies)
-        {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Image)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Year)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Country)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OveralRating)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Genre.Name)
-            </td>
-
+<h1>All movies</h1>
+<div class="row mt-5 mb-2">
+    @foreach (var item in Model.Movies)
+    {
+        <div class="col-lg-4 mt-lg-2">
+            <a style="text-decoration:none" asp-action="Details" asp-route-id="@item.Id">
+                <img class="img-thumbnail" src="@item.Image" alt="@item.Name" />
+                <span class="index-film-rating">@item.OveralRating</span>
+            </a>
+            <h2>@item.Name, @item.Year</h2>
+            <p>@item.Genre.Name</p>
+            <p>@item.Country</p>
             @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
             {
-                <td>
+                <p>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                </p>
+
             }
             else
             {
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                </td>
+                <a class="btn btn-warning" asp-action="Details" asp-route-id="@item.Id">Details</a>
             }
-        </tr>
-        }
-    </tbody>
-</table>
+        </div>
+    }
+</div>
+
+

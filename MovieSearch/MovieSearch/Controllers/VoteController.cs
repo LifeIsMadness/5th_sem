@@ -54,11 +54,12 @@ namespace MovieSearch.Controllers
             {
                 mark.UserProfileId = userProfile.Id;
                 _context.MovieMarks.Add(mark);
-                userProfile.MoviesViewedCount++;
+                userProfile.MoviesViewedCount++;            
             }
             else _context.MovieMarks.Update(mark);
 
-            UpdateOveralRating(mark.Value, mark.MovieId);
+            UpdateOveralRating(mark.MovieId);
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Details", "Movies", new { id = mark.MovieId });
@@ -75,14 +76,17 @@ namespace MovieSearch.Controllers
                     .Include(p => p.FavouriteMovies)
                     .FirstOrDefaultAsync(p => p.UserId == userId);
 
-            if(!userProfile.FavouriteMovies.Any(m => m.MovieId == id))
+            var favMovie = await _context.FavouriteMovies.FirstOrDefaultAsync(f => f.MovieId == id);
+
+            //'Cause m2m between fav model and user profile
+            if(!userProfile.FavouriteMovies.Any(m => m.MovieId == favMovie.Id))
             {
-                userProfile.FavouriteMovies.Add(new UserFavourites { MovieId = id, ProfileId = userProfile.Id });
+                userProfile.FavouriteMovies.Add(new UserFavourites { MovieId = favMovie.Id, ProfileId = userProfile.Id });
             }
             else
             {
-                var favMovie = userProfile.FavouriteMovies.FirstOrDefault(m => m.MovieId == id);
-                userProfile.FavouriteMovies.Remove(favMovie);
+                var userFavMovie = userProfile.FavouriteMovies.FirstOrDefault(m => m.MovieId == favMovie.Id);
+                userProfile.FavouriteMovies.Remove(userFavMovie);
             }
 
             await _context.SaveChangesAsync();
@@ -95,10 +99,13 @@ namespace MovieSearch.Controllers
             return _context.MovieMarks.Any(m => m.Id == id);
         }
 
-        private async void UpdateOveralRating(int value, int movieId)
+        private void UpdateOveralRating(int movieId)
         {
-            var movie = await _context.Movies.FindAsync(movieId);
-            var count = _context.Movies.Count();
+            var movie = _context.Movies.Find(movieId);
+            var count = _context.MovieMarks.Where(m => m.MovieId == movieId).Count();
+
+            if (!_context.MovieMarks.Any(m => m.MovieId == movieId)) 
+                count++;
 
             movie.OveralRating = 0;
             foreach (var mark in movie.MovieMarks)

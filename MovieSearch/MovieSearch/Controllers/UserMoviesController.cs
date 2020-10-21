@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MovieSearch.Data;
 using MovieSearch.Models;
+using MovieSearch.ViewModels.UserMovies;
 
 namespace MovieSearch.ViewModels
 {
@@ -36,9 +37,16 @@ namespace MovieSearch.ViewModels
             var userId = _userManager.GetUserId(User);
             var userProfile = await _context.MoviesProfiles
                 .Include(p => p.FavouriteMovies)
-                .ToListAsync();
-            //var favourites = 
-            return View();
+                .ThenInclude(f => f.Movie)
+                .ThenInclude(f => f.Movie)
+                .ThenInclude(m => m.Genre)
+                .FirstOrDefaultAsync(p => p.UserId == userId);
+
+            // Double select 'cause FavouriteMovie has Movie;
+            var favourites = userProfile.FavouriteMovies.Select(f => f.Movie).Select(f => f.Movie);
+            var viewModel = new UserMoviesIndexViewModel { FavMovies = favourites };
+
+            return View(viewModel);
         }
     }
 }

@@ -16,6 +16,8 @@ namespace MovieSearch.ViewModels.Movies
 
         public IEnumerable<Review> Reviews { get; set; }
 
+        public string IsFavourite { get; set; }
+
         //public int Mark { get; set; }
 
     }

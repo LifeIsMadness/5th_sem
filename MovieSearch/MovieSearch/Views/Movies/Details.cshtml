@@ -4,7 +4,6 @@
     ViewData["Title"] = "Details";
 }
 <link rel="stylesheet" href="~/css/stars.css" />
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 
 <h1>Details</h1>
 
@@ -63,30 +62,27 @@
                 <form asp-action="Vote" asp-controller="Vote">
 
                     <input type="hidden" asp-for="Mark.Id" />
-                    <input type="hidden" asp-for="Mark.MovieId" />
+                    <input type="hidden" name="Mark.MovieId" asp-for="Movie.Id" />
                     <input type="hidden" asp-for="Mark.UserProfileId" />
                     <div class="star-rating">
                         <div class="star-rating__wrap">
                             @for (int i = 10; i > 0; i--)
                             {
-                                <input class="star-rating__input" id=@($"star-rating-{i}") type="radio" asp-for="Mark.Value" value=@($"{i}")>
+                                <input class="star-rating__input" id=@($"star-rating-{i}") type="radio" asp-for="Mark.Value" value=@($"{i}") onclick="this.form.submit()">
                                 <label class="star-rating__ico fa fa-star-o fa-lg" for=@($"star-rating-{i}") title=@($"{i} out of 10 stars")></label>
                             }
                         </div>
                     </div>
-                    <input type="submit" value="Vote" class="btn btn-primary" />
-                    <!-- <input name="value" value="@ViewData["MovieMarkValue"]" />-->
-
                 </form>
             </dd>
             <dt class="col-sm-2">
                 Add to Favourites
             </dt>
-            <dd class="col-sm-10">
+            <dd class="col-sm-4">
                 <form asp-action="AddDeleteFavouriteMovie" asp-controller="Vote">
 
                     <input type="hidden" name="id" value="@Model.Movie.Id" />
-                    <input type="submit" value="Favourite" class="btn btn-primary" />
+                    <input type="submit" value="@Model.IsFavourite" class="btn btn-primary" />
                 </form>
             </dd>
         }
@@ -97,7 +93,15 @@
 </div>
 <div>
     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-    {<a asp-action="Edit" asp-route-id="@Model.Movie.Id">Edit</a>}
-    |
-    <a asp-action="Index">Back to List</a>
+    {
+        <p>
+            <a asp-action="Edit" asp-route-id="@Model.Movie.Id">Edit</a> |
+            <a asp-action="Index">Back to List</a>
+        </p>
+    }
+    else
+    {
+        <a class="btn btn-warning" asp-action="Index">Back to List</a>
+    }
+
 </div>
