@@ -16,6 +16,12 @@ a {
   color: #0366d6;
 }
 
+.row > dd, .row > dt {
+    font-size: 20px;
+    font-family: Arial, Tahoma, Verdana;
+}
+
+
 .btn-primary {
   color: #fff;
   background-color: #1b6ec2;
@@ -89,6 +95,11 @@ body {
     margin: 10px 5px 10px 10px;
 }
 
+.div-m-b {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 h1 {
     text-align: center;
 }
@@ -119,5 +130,50 @@ h1 {
     color: #F9F0DA;
 }
 
+.bordered {
+    display: block;
+    border: 1px solid transparent;
+    cursor: pointer;
+    padding-bottom: 10px;
+    z-index: 3;
+}
+
+.bordered:hover {
+    border: 1px solid #6d6d6d;
+}
+
+.bordered .item {
+    padding: 15px 15px 10px;
+}
+
+.item-span {
+    display: table;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.rating-details {
+    font-size: 24px;
+    font-weight: bold;
+    font-family: Arial, Tahoma, Verdana;
+}
+
+.rating-index {
+    font-weight: bold;
+    font-family: Arial, Tahoma, Verdana;
+}
+
+span.span-red {
+    color: red;
+}
+
+span.span-yellow {
+    color: #9d8c22;
+}
+
+span.span-green {
+    color: green;
+}
 
 

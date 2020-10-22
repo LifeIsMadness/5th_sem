@@ -7,7 +7,7 @@
 
 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
 {<p>
-        <a asp-action="Create">Create New</a>
+        <a class="btn btn-info" asp-action="Create">Create New</a>
     </p>
 }
 <div class="div-m row">
@@ -32,28 +32,24 @@
 <div class="row mt-5 mb-2">
     @foreach (var item in Model.Movies)
     {
-        <div class="col-lg-4 mt-lg-2">
+    <div class="col-lg-4 mt-lg-2 bordered">
+        <div class="item">
             <a style="text-decoration:none" asp-action="Details" asp-route-id="@item.Id">
-                <img class="img-thumbnail" src="@item.Image" alt="@item.Name" />
-                <span class="index-film-rating">@item.OveralRating</span>
+                <span class="item-span">
+                    <img class="img-thumbnail" src="@item.Image" alt="@item.Name" />
+                </span>
+                <h2 style="color:#000000">@item.Name</h2>
+                <p style="color:#000000">@item.Genre.Name, @item.Year</p>
+                <p style="color:#000000">@item.Country</p>
+                <span>
+                    <span style="margin-right:5px; color:#000000">Rating:</span>
+                    <rating class="rating-index">@item.OveralRating</rating>
+                </span>
+                @*<p style="color:#000000">Rating: @item.OveralRating</p>*@
             </a>
-            <h2>@item.Name, @item.Year</h2>
-            <p>@item.Genre.Name</p>
-            <p>@item.Country</p>
-            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-            {
-                <p>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </p>
 
-            }
-            else
-            {
-                <a class="btn btn-warning" asp-action="Details" asp-route-id="@item.Id">Details</a>
-            }
         </div>
+    </div>
     }
 </div>
 

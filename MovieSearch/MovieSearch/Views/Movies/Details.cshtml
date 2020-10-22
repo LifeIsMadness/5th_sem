@@ -7,58 +7,13 @@
 
 <h1>Details</h1>
 
-<div>
-    <h4>Movie</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Movie.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Movie.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Movie.Image)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Movie.Image)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Movie.Title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Movie.Title)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Movie.Year)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Movie.Year)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Movie.Country)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Movie.Country)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Movie.OveralRating)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Movie.OveralRating)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Movie.Genre)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Movie.Genre.Name)
-        </dd>
+<div class="row">
+
+    <div class="col-md-3">
+        <img class="img-thumbnail" src="@Model.Movie.Image" alt="@Model.Movie.Name" />
         @if (User.Identity.IsAuthenticated)
         {
-            <dt class="col-sm-2">
-                Vote
-            </dt>
-            <dd class="col-sm-10">
+            <div class="div-m-b">
                 <form asp-action="Vote" asp-controller="Vote">
 
                     <input type="hidden" asp-for="Mark.Id" />
@@ -74,28 +29,70 @@
                         </div>
                     </div>
                 </form>
-            </dd>
-            <dt class="col-sm-2">
-                Add to Favourites
-            </dt>
-            <dd class="col-sm-4">
+            </div>
+            <div class="div-m-b">
                 <form asp-action="AddDeleteFavouriteMovie" asp-controller="Vote">
 
                     <input type="hidden" name="id" value="@Model.Movie.Id" />
                     <input type="submit" value="@Model.IsFavourite" class="btn btn-primary" />
                 </form>
-            </dd>
+            </div>
+
+
         }
+    </div>
 
-
-    </dl>
-
+    <div class="col-md-9">
+        <h4>About movie</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Movie.Name)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Movie.Name)
+            </dd>
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Movie.Year)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Movie.Year)
+            </dd>
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Movie.Country)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Movie.Country)
+            </dd>
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Movie.Genre)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Movie.Genre.Name)
+            </dd>
+        </dl>
+        <hr />
+    </div>
 </div>
-<div>
+
+<div class="div-m-b">
+    <h4>Description</h4>
+    <p>@Model.Movie.Title</p>
+</div>
+
+<div class="div-m-b">
+    <span>
+    <span style="margin-right:10px; font-size:1.5rem;">Movie rating:</span> 
+    <rating class="rating-details">@Model.Movie.OveralRating</rating>
+    </span>
+</div>
+
+<div class="div-m-b">
     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         <p>
             <a asp-action="Edit" asp-route-id="@Model.Movie.Id">Edit</a> |
+            <a asp-action="Delete" asp-route-id="@Model.Movie.Id">Delete</a> |
             <a asp-action="Index">Back to List</a>
         </p>
     }
@@ -103,5 +100,4 @@
     {
         <a class="btn btn-warning" asp-action="Index">Back to List</a>
     }
-
 </div>
