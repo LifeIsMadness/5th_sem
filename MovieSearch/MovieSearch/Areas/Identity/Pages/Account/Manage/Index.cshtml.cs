@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using MovieSearch.Data;
 using MovieSearch.Models;
+using SQLitePCL;
+
 
 namespace MovieSearch.Areas.Identity.Pages.Account.Manage
 {
@@ -16,16 +22,17 @@ namespace MovieSearch.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ApplicationDbContext _context;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
-
-        public string Username { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -41,20 +48,23 @@ namespace MovieSearch.Areas.Identity.Pages.Account.Manage
 
             [Display(Name = "Profile Picture")]
             public byte[] ProfilePicture { get; set; }
+
+            public string Username { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
         {
+
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            var profilePicture = user.ProfilePicture;
-
-            Username = userName;
+            var profilePicture = await _context.ProfilePictures
+                .FirstOrDefaultAsync(p => p.Id == user.ProfilePictureId);
 
             Input = new InputModel
             {
+                Username = userName,
                 PhoneNumber = phoneNumber,
-                ProfilePicture = profilePicture
+                ProfilePicture = profilePicture?.Picture
             };
         }
 
@@ -95,13 +105,34 @@ namespace MovieSearch.Areas.Identity.Pages.Account.Manage
                 }
             }
 
+            var userName = await _userManager.GetUserNameAsync(user);
+            if (Input.Username != userName)
+            {
+                var setUserNameResult = await _userManager.SetUserNameAsync(user, Input.Username);
+                if (!setUserNameResult.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to set username.";
+                    return RedirectToPage();
+                }
+            }
+
             if (Request.Form.Files.Count > 0)
             {
                 IFormFile file = Request.Form.Files.FirstOrDefault();
                 using (var dataStream = new MemoryStream())
                 {
                     await file.CopyToAsync(dataStream);
-                    user.ProfilePicture = dataStream.ToArray();
+                    var array = dataStream.ToArray();
+
+                    Expression<Func<ProfilePicture, bool>> expr = p => p.Picture.SequenceEqual(array);
+
+                    var picture = _context.ProfilePictures
+                        .AsEnumerable()
+                        .FirstOrDefault(p => p.Picture.SequenceEqual(array));
+
+                    if (picture == null)
+                        user.ProfilePicture = new ProfilePicture { Picture = array };
+                    else user.ProfilePicture = picture;
                 }
 
                 await _userManager.UpdateAsync(user);

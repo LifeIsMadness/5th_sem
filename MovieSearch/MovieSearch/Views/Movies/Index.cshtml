@@ -5,7 +5,7 @@
 }
 <link rel="stylesheet" href="~/css/dropdown.css" />
 
-@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+@if (User.Identity.IsAuthenticated && User.IsInRole("SuperAdmin"))
 {<p>
         <a class="btn btn-info" asp-action="Create">Create New</a>
     </p>
@@ -14,7 +14,7 @@
     <form asp-action="Index" method="get">
         <p>
             <select class="wrapper-dropdown-3" name="genreId" asp-items="Model.Genres" 
-                    onchange="document.location = '/?genreId=' + this.value">
+                    onchange="this.form.submit()">
                 <option value="">All</option>
             </select>
         </p>

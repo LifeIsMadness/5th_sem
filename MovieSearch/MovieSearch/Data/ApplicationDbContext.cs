@@ -23,6 +23,8 @@ namespace MovieSearch.Data
 
         public DbSet<Review> Reviews { get; set; }
 
+        public DbSet<ProfilePicture> ProfilePictures { get; set; }
+
         public DbSet<UserMoviesProfile> MoviesProfiles { get; set; }
 
         public DbSet<FavouriteMovie> FavouriteMovies { get; set; }

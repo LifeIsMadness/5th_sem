@@ -22,7 +22,7 @@ namespace MovieSearch.TagHelpers
             {              
                 var value = float.Parse(content.GetContent());
 
-                if (value > 0 && value < 5)
+                if (value >= 0 && value < 5)
                 {
                     output.Attributes.SetAttribute("class", $"{prevClass} span-red");
                 }

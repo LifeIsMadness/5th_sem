@@ -1,0 +1,40 @@
+﻿
+section {
+    font-family: Arial, Tahoma, Verdana, sans-serif;
+    margin-bottom: 15px;
+    background-color: rgba(233, 225, 225, 0.53);
+    border-radius: 6px;
+}
+
+div.review_head {
+    align-items: center;
+    display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(31, 31, 31, .07);
+}
+
+div.review_head_info {
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+    margin-left: 8px;
+}
+
+div.review_body {
+    padding: 8px 12px 10px;
+}
+
+div.img_avatar {
+    width: 48px;
+    height: 48px;
+}
+
+img.review_avatar {
+    width: 48px;
+    height: 48px;
+    max-height: 100%;
+    max-width: 100%;
+    border-radius: 50%;
+}

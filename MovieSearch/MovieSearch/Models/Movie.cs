@@ -39,6 +39,8 @@ namespace MovieSearch.Models
 
         public List<MovieMark> MovieMarks { get; set; }
 
+        public List<Review> Reviews { get; set; }
+
         public FavouriteMovie FavouriteMovie { get; set; }
     }
 }

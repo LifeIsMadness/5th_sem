@@ -1,0 +1,72 @@
+﻿@model MovieSearch.ViewModels.UserMovies.UserMoviesViewModel
+
+@{
+    ViewData["Title"] = "Favourites";
+    ViewData["ActivePage"] = "Favourites";
+}
+
+<h4 style="margin-bottom:10px;">@ViewData["Title"]</h4>
+
+<table class="table table-sm table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>
+                @Html.DisplayName("Movie")
+            </th>
+            @if (Model.ForCurrentUser)
+            {
+                <th>
+                    @Html.DisplayName("My mark")
+                </th>
+            }
+            <th>
+                @Html.DisplayName("Rating")
+            </th>
+
+            <th>
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model.MoviesAndMarks)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(item.Movie.Name + $"({item.Movie.Year})",
+                   "Details",
+                   "Movies",
+                   new { id = item.Movie.Id })
+                </td>
+                @if (Model.ForCurrentUser)
+                {
+                    <td>
+                        <rating class="rating-details">@item.Mark?.Value</rating>
+                    </td>
+                }
+                <td>
+                    <rating class="rating-details">@item.Movie.OveralRating</rating>
+                </td>
+                @if (Model.ForCurrentUser)
+                {
+                    <td>
+                        <form asp-action="AddDeleteFavouriteMovie" asp-controller="Vote">
+
+                            <input type="hidden" name="id" value="@item.Movie.Id" />
+                            <input type="hidden" asp-for="ReturnUrl" />
+                            <input type="submit" value="Delete" class="btn btn-info" />
+                        </form>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a class="btn btn-info" title="@item.Movie.Name" asp-action="Details" asp-controller="Movies" asp-route-id="@item.Movie.Id">Add favourite!</a>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+

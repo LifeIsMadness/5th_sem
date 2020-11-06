@@ -1,0 +1,26 @@
+﻿@page
+@model SetRolesModel
+@{
+    ViewData["Title"] = "Set roles for this user";
+    ViewData["ActivePage"] = "SetRoles";
+}
+<h4>@ViewData["Title"]</h4>
+
+<form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    @for (int i = 0; i < Model.AllRoles.Count; i++)
+    {
+        <div class="form-check m-1">
+            <input type="hidden" asp-for="@Model.AllRoles[i].RoleId" />
+            <input type="hidden" asp-for="@Model.AllRoles[i].RoleName" />
+            <input asp-for="@Model.AllRoles[i].Selected" class="form-check-input" />
+            <label class="form-check-label" asp-for="@Model.AllRoles[i].Selected">
+                @Model.AllRoles[i].RoleName
+            </label>
+        </div>
+    }
+    <div class="form-group">
+        <input type="submit" value="Update" class="btn btn-primary" />
+        <a class="btn btn-primary" asp-page="./ManageRoles">Cancel</a>
+    </div>
+</form>

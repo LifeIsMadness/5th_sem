@@ -2,6 +2,9 @@
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
+
+<link rel="stylesheet" href="~/css/blinking_text.css" />
+
 <ul class="nav nav-pills flex-column">
     <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
     <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
@@ -12,4 +15,9 @@
     }
     <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
     <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
+    @if (User.IsInRole("SuperAdmin"))
+    {
+        <li class="nav-item"><a class="nav-link @ManageNavPages.ManageRolesNavClass(ViewContext)" id="manage-roles" asp-page="./ManageRoles">
+            Manage roles<sup id="blink2">superadmin</sup></a></li>
+    }
 </ul>

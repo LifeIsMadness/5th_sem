@@ -15,12 +15,16 @@ namespace MovieSearch.Models
         [Required]
         [Column(TypeName = "Text")]
         public string Content { get; set; }
-
-        [DataType(DataType.Date)]
+  
+        [DataType(DataType.DateTime)]
         public DateTime Date { get; set; }
 
         public int UserProfileId { get; set; }
 
         public UserMoviesProfile UserProfile { get; set; }
+
+        public int MovieId { get; set; }
+
+        public Movie Movie { get; set; }
     }
 }

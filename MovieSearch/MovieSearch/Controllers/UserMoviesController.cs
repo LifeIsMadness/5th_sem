@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.Extensions.Logging;
 using MovieSearch.Data;
 using MovieSearch.Models;
@@ -13,8 +15,29 @@ using MovieSearch.ViewModels.UserMovies;
 
 namespace MovieSearch.ViewModels
 {
+    [Authorize]
     public class UserMoviesController : Controller
     {
+
+        public class MovieComparer : IEqualityComparer<Movie>
+        {
+            public bool Equals([AllowNull] Movie x, [AllowNull] Movie y)
+            {
+                if (y == null || x == null)
+                {
+                    return false;
+                }
+
+                // TODO: write your implementation of Equals() here
+                return x.Id == y.Id;
+            }
+
+            public int GetHashCode([DisallowNull] Movie obj)
+            {
+                return base.GetHashCode();
+            }
+        }
+
         private readonly ApplicationDbContext _context;
 
         private readonly ILogger<UserMoviesController> _logger;
@@ -31,20 +54,93 @@ namespace MovieSearch.ViewModels
             _userManager = userManager;
         }
 
-        [Authorize]
-        public async Task<IActionResult> Index()
+        [Route("ViewedMovies/{userId:Guid}/[Action]", Name = "Favourites")]
+        public async Task<IActionResult> Favourites(string userId)
         {
-            var userId = _userManager.GetUserId(User);
+            var currentUserId = _userManager.GetUserId(User);
+
             var userProfile = await _context.MoviesProfiles
+                .Include(u => u.User)
                 .Include(p => p.FavouriteMovies)
                 .ThenInclude(f => f.Movie)
                 .ThenInclude(f => f.Movie)
                 .ThenInclude(m => m.Genre)
+                .Include(p => p.Marks)
+                .ThenInclude(m => m.Movie)
                 .FirstOrDefaultAsync(p => p.UserId == userId);
 
+            if(userProfile == null)
+            {
+                return NotFound();
+            }
+
             // Double select 'cause FavouriteMovie has Movie;
-            var favourites = userProfile.FavouriteMovies.Select(f => f.Movie).Select(f => f.Movie);
-            var viewModel = new UserMoviesIndexViewModel { FavMovies = favourites };
+            var favourites = userProfile.FavouriteMovies
+                .Select(f => f.Movie)
+                .Select(f => f.Movie)
+                .OrderBy(f => f.Name);
+
+            var marks = userProfile.Marks.OrderBy(m => m.Movie.Name);
+
+            var markedMovies = marks.Select(m => m.Movie);
+
+            var unmarkedMovies = favourites.Except(markedMovies, new MovieComparer());
+
+            var moviesAndMarks = favourites.Zip(marks).ToList();
+
+            foreach (var movie in unmarkedMovies)
+            {
+                moviesAndMarks.Add((movie, null));
+            }
+
+            moviesAndMarks = moviesAndMarks.OrderBy(m => m.First.Name).ToList();
+
+            var viewModel = new UserMoviesViewModel
+            {
+                MoviesAndMarks = moviesAndMarks,
+
+                ForCurrentUser = userId == currentUserId,
+
+                UserName = userProfile.User.UserName,
+
+                ReturnUrl = Url.RouteUrl("Favourites", new { UserId = userId }) //"/UserMovies/"
+            };
+
+            return View(viewModel);
+        }
+
+        [Route("ViewedMovies/{userId:Guid}/[Action]", Name = "Viewed")]
+        public async Task<IActionResult> ViewedMovies(string userId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            var userProfile = await _context.MoviesProfiles
+                .Include(p => p.User)
+                .Include(p => p.Marks)
+                .ThenInclude(m => m.Movie)
+                .FirstOrDefaultAsync(p => p.UserId == userId);
+
+            if (userProfile == null)
+            {
+                return NotFound();
+            }
+
+            // Double select 'cause FavouriteMovie has Movie;
+            var movies = userProfile.Marks.Select(m => m.Movie).OrderBy(m => m.Name);
+
+            var marks = userProfile.Marks.OrderBy(m => m.Movie.Name);
+
+            var moviesAndMarks = movies.Zip(marks);
+
+            var viewModel = new UserMoviesViewModel
+            {
+                MoviesAndMarks = moviesAndMarks,
+
+                ForCurrentUser = userId == currentUserId,
+
+                UserName = userProfile.User.UserName,
+
+                ReturnUrl = Url.RouteUrl("Viewed", new { UserId = userId })
+            };
 
             return View(viewModel);
         }

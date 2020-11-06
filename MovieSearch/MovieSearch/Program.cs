@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MovieSearch.Data;
 using MovieSearch.Models;
 
 namespace MovieSearch
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();//.Run();
             using(var scope = host.Services.CreateScope())
@@ -21,7 +23,13 @@ namespace MovieSearch
                 var services = scope.ServiceProvider;
                 try
                 {
-                    DbInitializer.Initialize(services);
+                    var context = services.GetRequiredService<ApplicationDbContext>();
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                    DbInitializer.Initialize(context, userManager);
+                    await DbInitializer.SeedRolesAsync(userManager, roleManager);
+                    await DbInitializer.SeedSuperAdminAsync(userManager, roleManager, context);
                 }
                 catch(Exception ex)
                 {

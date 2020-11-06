@@ -1,10 +1,5 @@
-﻿using MovieSearch.Migrations;
-using MovieSearch.Models;
-using MovieSearch.Models.ExtendedUser;
-using System;
+﻿using MovieSearch.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MovieSearch.ViewModels.Movies
 {
@@ -17,8 +12,6 @@ namespace MovieSearch.ViewModels.Movies
         public IEnumerable<Review> Reviews { get; set; }
 
         public string IsFavourite { get; set; }
-
-        //public int Mark { get; set; }
 
     }
 }

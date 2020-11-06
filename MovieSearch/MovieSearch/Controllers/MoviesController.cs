@@ -47,7 +47,7 @@ namespace MovieSearch.Controllers
 
                 var genre = await _context.MovieGenres.FindAsync(genreId);
                 viewModel.Genres = new SelectList(_context.MovieGenres, "Id", "Name", genre.Id);
-      
+
             }
             else
             {
@@ -79,6 +79,8 @@ namespace MovieSearch.Controllers
         }
 
         // GET: Movies/Details/5
+        //TODO: Refactoring
+        //details view
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -98,40 +100,51 @@ namespace MovieSearch.Controllers
             var userId = _userManager.GetUserId(User);
 
             var viewModel = new MovieDetailsViewModel { Movie = movie };
-            viewModel.Reviews = await _context.Reviews
+            viewModel.Reviews = _context.Reviews
                 .AsNoTracking()
                 .Include(r => r.UserProfile)
-                .ToListAsync();
+                .ThenInclude(p => p.User)
+                .ThenInclude(u => u.ProfilePicture)
+                .Where(r => r.MovieId == id);
 
             if (userId != null)
             {
                 var mark = await _context.MovieMarks
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(m => 
+                    .FirstOrDefaultAsync(m =>
                     m.Movie.Id == movie.Id && m.UserProfile.UserId == userId);
 
-                var favMovie = await _context.FavouriteMovies
-                    .Include(f => f.UserProfiles)
-                    .ThenInclude(f => f.Profile)
-                    .FirstOrDefaultAsync(f => f.MovieId == movie.Id);
+                bool isFavourite = IsFavouriteMovie(userId, movie.Id);
 
-                var isFavourite = favMovie.UserProfiles.Any(f => f.Profile.UserId == userId);
-                    
                 viewModel.Mark = mark;
-                if(isFavourite) viewModel.IsFavourite = "In Favourites";
+                if (isFavourite) viewModel.IsFavourite = "In Favourites";
                 else viewModel.IsFavourite = "Add Favourite";
             }
-                
+
             return View(viewModel);
+        }
+
+        private bool IsFavouriteMovie(string userId, int movidId)
+        {
+            var favMovie = _context.FavouriteMovies
+               .Include(f => f.UserProfiles)
+               .ThenInclude(f => f.Profile)
+               .FirstOrDefault(f => f.MovieId == movidId);
+
+            return favMovie.UserProfiles.Any(f => f.Profile.UserId == userId);
         }
 
         // GET: Movies/Create
         // Only admin can create new a db record. 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin")]
         public IActionResult Create()
         {
-            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Name");
-            return View();
+            MovieEditViewModel viewModel = new MovieEditViewModel
+            {
+                Genres = new SelectList(_context.MovieGenres, "Id", "Name"),
+            };
+
+            return View(viewModel);
         }
 
         // POST: Movies/Create
@@ -139,23 +152,28 @@ namespace MovieSearch.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Create([Bind("Id,Name,Image,Title,Year,Country,GenreId")] Movie movie)
         {
             if (ModelState.IsValid)
             {
-                _context.AddRange(movie, new FavouriteMovie { Movie = movie});
+                _context.AddRange(movie, new FavouriteMovie { Movie = movie });
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
             var genre = await _context.MovieGenres.FindAsync(movie.GenreId);
-            ViewData["GenreId"] = new SelectList(_context.MovieGenres, "Id", "Name", genre.Name);
-            return View(movie);
+            MovieEditViewModel viewModel = new MovieEditViewModel
+            {
+                Movie = movie,
+                Genres = new SelectList(_context.MovieGenres, "Id", "Name", genre.Name),
+            };
+
+            return View(viewModel);
         }
 
         // GET: Movies/Edit/5
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -169,7 +187,7 @@ namespace MovieSearch.Controllers
                 return NotFound();
             }
 
-            MovieEditViewModel viewModel = new MovieEditViewModel 
+            MovieEditViewModel viewModel = new MovieEditViewModel
             {
                 Movie = movie,
                 Genres = new SelectList(_context.MovieGenres, "Id", "Name"),
@@ -183,7 +201,7 @@ namespace MovieSearch.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Image,Title,Year,Country,OveralRating,GenreId")] Movie movie)
         {
             if (id != movie.Id)
@@ -223,7 +241,7 @@ namespace MovieSearch.Controllers
         }
 
         // GET: Movies/Delete/5
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -238,14 +256,14 @@ namespace MovieSearch.Controllers
             {
                 return NotFound();
             }
-            
+
             return View(movie);
         }
 
         // POST: Movies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var movie = await _context.Movies.FindAsync(id);

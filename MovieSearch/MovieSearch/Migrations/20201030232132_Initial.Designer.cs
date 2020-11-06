@@ -10,14 +10,14 @@ using MovieSearch.Data;
 namespace MovieSearch.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201002145043_UserProfile")]
-    partial class UserProfile
+    [Migration("20201030232132_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.8")
+                .HasAnnotation("ProductVersion", "3.1.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -194,8 +194,8 @@ namespace MovieSearch.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<byte[]>("ProfilePicture")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<int>("ProfilePictureId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -216,6 +216,8 @@ namespace MovieSearch.Migrations
                         .IsUnique()
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("ProfilePictureId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -242,6 +244,24 @@ namespace MovieSearch.Migrations
                     b.ToTable("MoviesProfiles");
                 });
 
+            modelBuilder.Entity("MovieSearch.Models.FavouriteMovie", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId")
+                        .IsUnique();
+
+                    b.ToTable("FavouriteMovies");
+                });
+
             modelBuilder.Entity("MovieSearch.Models.Movie", b =>
                 {
                     b.Property<int>("Id")
@@ -250,21 +270,25 @@ namespace MovieSearch.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Country")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GenreId")
                         .HasColumnType("int");
 
                     b.Property<string>("Image")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("OveralRating")
                         .HasColumnType("real");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("NVARCHAR(500)");
 
                     b.Property<int>("Year")
@@ -317,6 +341,21 @@ namespace MovieSearch.Migrations
                     b.ToTable("MovieMarks");
                 });
 
+            modelBuilder.Entity("MovieSearch.Models.ProfilePicture", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<byte[]>("Picture")
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProfilePictures");
+                });
+
             modelBuilder.Entity("MovieSearch.Models.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -325,16 +364,40 @@ namespace MovieSearch.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Content")
+                        .IsRequired()
                         .HasColumnType("Text");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
 
                     b.Property<int>("UserProfileId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MovieId");
+
                     b.HasIndex("UserProfileId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("MovieSearch.Models.UserFavourites", b =>
+                {
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MovieId", "ProfileId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("UserFavourites");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -388,11 +451,29 @@ namespace MovieSearch.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MovieSearch.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("MovieSearch.Models.ProfilePicture", "ProfilePicture")
+                        .WithMany("Profiles")
+                        .HasForeignKey("ProfilePictureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MovieSearch.Models.ExtendedUser.UserMoviesProfile", b =>
                 {
                     b.HasOne("MovieSearch.Models.ApplicationUser", "User")
                         .WithOne("MoviesProfile")
                         .HasForeignKey("MovieSearch.Models.ExtendedUser.UserMoviesProfile", "UserId");
+                });
+
+            modelBuilder.Entity("MovieSearch.Models.FavouriteMovie", b =>
+                {
+                    b.HasOne("MovieSearch.Models.Movie", "Movie")
+                        .WithOne("FavouriteMovie")
+                        .HasForeignKey("MovieSearch.Models.FavouriteMovie", "MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MovieSearch.Models.Movie", b =>
@@ -421,9 +502,30 @@ namespace MovieSearch.Migrations
 
             modelBuilder.Entity("MovieSearch.Models.Review", b =>
                 {
+                    b.HasOne("MovieSearch.Models.Movie", "Movie")
+                        .WithMany("Reviews")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MovieSearch.Models.ExtendedUser.UserMoviesProfile", "UserProfile")
                         .WithMany("Reviews")
                         .HasForeignKey("UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MovieSearch.Models.UserFavourites", b =>
+                {
+                    b.HasOne("MovieSearch.Models.FavouriteMovie", "Movie")
+                        .WithMany("UserProfiles")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MovieSearch.Models.ExtendedUser.UserMoviesProfile", "Profile")
+                        .WithMany("FavouriteMovies")
+                        .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

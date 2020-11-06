@@ -39,6 +39,8 @@ namespace MovieSearch
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,6 +70,7 @@ namespace MovieSearch
                 endpoints.MapControllerRoute(
                     name: "movies",
                     pattern: "{controller=Movies}/{action=Index}/{id?}");
+
                 endpoints.MapRazorPages();
             });
             

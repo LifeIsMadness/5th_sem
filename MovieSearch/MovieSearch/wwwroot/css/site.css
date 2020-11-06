@@ -38,6 +38,7 @@ a {
     color: #fff;
     background-color: #f68d43;
     border-color: #1861ac;
+    border-radius: .25rem;
 }
 
 /* Sticky footer styles
@@ -98,6 +99,10 @@ body {
 .div-m-b {
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.div-m-b-p {
+    padding: 0 0 10px 0;
 }
 
 h1 {
@@ -176,4 +181,13 @@ span.span-green {
     color: green;
 }
 
+.table td {
+    vertical-align: middle;
+}
 
+img.profile_avatar {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 30px;
+}

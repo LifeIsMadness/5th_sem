@@ -2,14 +2,27 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Manage your movie's profile</h2>
-
+@if (Model.ForCurrentUser)
+{
+    <h2>Manage your movie's profile</h2>
+}
+else
+{
+    <h2>@($"{Model.UserName}'s") movie's profile</h2>
+}
 <div>
-    <h4>Browse your favourite movies</h4>
+    @if (Model.ForCurrentUser)
+    {
+        <h4>Browse your favourite movies</h4>
+    }
+    else
+    {
+        <h4>Browse @($"{Model.UserName}'s") favourite movies</h4>
+    }
     <hr />
     <div class="row">
         <div class="col-md-3">
-            <partial name="_UserMoviesNav" />
+            @await Component.InvokeAsync("NavigationList", ViewData["ActivePage"])
         </div>
         <div class="col-md-9">
             @RenderBody()

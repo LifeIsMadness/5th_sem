@@ -1,25 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using MovieSearch.Data;
-using MovieSearch.Migrations;
 using MovieSearch.Models;
-using MovieSearch.Models.ExtendedUser;
-using SQLitePCL;
 
 namespace MovieSearch.Controllers
 {
+    [Authorize]
     public class VoteController : Controller
     {
-
         private readonly ApplicationDbContext _context;
 
         private readonly ILogger<VoteController> _logger;
@@ -35,15 +30,11 @@ namespace MovieSearch.Controllers
             _context = context;
             _userManager = userManager;
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
 
-        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Vote([Bind("Id,Value,MovieId,UserProfileId")] MovieMark mark)
+        public async Task<IActionResult> Vote(string returnUrl, 
+            [Bind("Id,Value,MovieId,UserProfileId")] MovieMark mark)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -54,21 +45,23 @@ namespace MovieSearch.Controllers
             {
                 mark.UserProfileId = userProfile.Id;
                 _context.MovieMarks.Add(mark);
-                userProfile.MoviesViewedCount++;            
+                userProfile.MoviesViewedCount++;
             }
+            else if (MarkExists(mark.Id, mark.Value)) _context.MovieMarks.Remove(mark);
             else _context.MovieMarks.Update(mark);
 
             UpdateOveralRating(mark.MovieId);
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Details", "Movies", new { id = mark.MovieId });
+            if (string.IsNullOrEmpty(returnUrl))
+                return RedirectToAction("Details", "Movies", new { id = mark.MovieId });
+            else return Redirect(returnUrl);
         }
 
-        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddDeleteFavouriteMovie(int id)
+        public async Task<IActionResult> AddDeleteFavouriteMovie(int id, string returnUrl)
         {
             var userId = _userManager.GetUserId(User);
 
@@ -91,7 +84,9 @@ namespace MovieSearch.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Details", "Movies", new { id = id });
+            if (string.IsNullOrEmpty(returnUrl))
+                return RedirectToAction("Details", "Movies", new { id = id });
+            else return Redirect(returnUrl);
         }
 
         private bool MarkExists(int id)
@@ -99,17 +94,31 @@ namespace MovieSearch.Controllers
             return _context.MovieMarks.Any(m => m.Id == id);
         }
 
+        private bool MarkExists(int id, int value)
+        {
+            return _context.MovieMarks.Any(m => m.Id == id && m.Value == value);
+        }
+
         private void UpdateOveralRating(int movieId)
         {
-            var movie = _context.Movies.Find(movieId);
-            var count = _context.MovieMarks.Where(m => m.MovieId == movieId).Count();
+            var entries = _context.ChangeTracker.Entries<MovieMark>()
+                .Where(e => e.State == EntityState.Deleted)
+                .Select(e => e.Entity);
 
-            if (!_context.MovieMarks.Any(m => m.MovieId == movieId)) 
-                count++;
+            var movie = _context.Movies.Include(m => m.MovieMarks).
+                FirstOrDefault(m => m.Id == movieId);
+           
+            var marks = movie.MovieMarks.Except(entries);
+
+            var count = marks.Count();
 
             movie.OveralRating = 0;
-            foreach (var mark in movie.MovieMarks)
-            { movie.OveralRating += mark.Value / count;}
+
+            foreach (var mark in marks)
+            { movie.OveralRating += (float)mark.Value / count;}
+
+
+            movie.OveralRating = (float)Math.Round(movie.OveralRating, 3);
 
             _context.Movies.Update(movie);
         }
