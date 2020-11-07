@@ -10,47 +10,12 @@
         <a class="btn btn-info" asp-action="Create">Create New</a>
     </p>
 }
-<div class="div-m row">
-    <form asp-action="Index" method="get">
-        <p>
-            <select class="wrapper-dropdown-3" name="genreId" asp-items="Model.Genres" 
-                    onchange="this.form.submit()">
-                <option value="">All</option>
-            </select>
-        </p>
-    </form>
-    <form asp-action="IndexSearch" method="get">
-        <p>
-            <input class="wrapper-dropdown-3-search" type="search" value="@ViewBag.SearchValue" name="searchValue" 
-                   placeholder="Search..." />
-            <button class="button-search" type="submit" value="Search"></button>
-        </p>
-    </form>
+
+
+
+<div id="view-all">
+     @await Html.PartialAsync("_ViewAll", Model)   
 </div>
 
-<h1>All movies</h1>
-<div class="row mt-5 mb-2">
-    @foreach (var item in Model.Movies)
-    {
-    <div class="col-lg-4 mt-lg-2 bordered">
-        <div class="item">
-            <a style="text-decoration:none" asp-action="Details" asp-route-id="@item.Id">
-                <span class="item-span">
-                    <img class="img-thumbnail" src="@item.Image" alt="@item.Name" />
-                </span>
-                <h2 style="color:#000000">@item.Name</h2>
-                <p style="color:#000000">@item.Genre.Name, @item.Year</p>
-                <p style="color:#000000">@item.Country</p>
-                <span>
-                    <span style="margin-right:5px; color:#000000">Rating:</span>
-                    <rating class="rating-index">@item.OveralRating</rating>
-                </span>
-                @*<p style="color:#000000">Rating: @item.OveralRating</p>*@
-            </a>
-
-        </div>
-    </div>
-    }
-</div>
 
 

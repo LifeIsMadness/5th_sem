@@ -1,0 +1,41 @@
+﻿
+
+<div class="div-m row">
+    <p style="margin: 10px 5px 10px 10px;">
+        <select class="wrapper-dropdown-3" name="genreId" asp-items="Model.Genres"
+                onchange="sortByGenre(this.value)">
+            <option value="">All</option>
+        </select>
+    </p>
+
+    <p style="margin: 10px 5px 10px 10px;">
+        <input class="wrapper-dropdown-3-search" type="search" value="@ViewBag.SearchValue" name="searchValue" id="search_inp"
+               onkeyup="inputSearch(event)" placeholder="Search..." />
+        <button class="button-search" type="button" onclick="searchMovie()" value="Search"></button>
+    </p>
+</div>
+
+<h1>All movies</h1>
+<div class="row mt-5 mb-2">
+    @foreach (var item in Model.Movies)
+    {
+        <div class="col-lg-4 mt-lg-2 bordered">
+            <div class="item">
+                <a style="text-decoration:none" asp-action="Details" asp-route-id="@item.Id">
+                    <span class="item-span">
+                        <img class="img-thumbnail" src="@item.Image" alt="@item.Name" />
+                    </span>
+                    <h2 style="color:#000000">@item.Name</h2>
+                    <p style="color:#000000">@item.Genre.Name, @item.Year</p>
+                    <p style="color:#000000">@item.Country</p>
+                    <span>
+                        <span style="margin-right:5px; color:#000000">Rating:</span>
+                        <rating class="rating-index">@item.OveralRating</rating>
+                    </span>
+                    @*<p style="color:#000000">Rating: @item.OveralRating</p>*@
+                </a>
+
+            </div>
+        </div>
+    }
+</div>

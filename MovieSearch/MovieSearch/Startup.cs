@@ -69,7 +69,7 @@ namespace MovieSearch
             {
                 endpoints.MapControllerRoute(
                     name: "movies",
-                    pattern: "{controller=Movies}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action=Index}/{id?}");
 
                 endpoints.MapRazorPages();
             });

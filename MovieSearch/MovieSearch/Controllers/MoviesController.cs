@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using MovieSearch.Data;
 using MovieSearch.Models;
 using MovieSearch.ViewModels.Movies;
+using MovieSearch.RenderHelper;
 
 namespace MovieSearch.Controllers
 {
@@ -34,7 +35,22 @@ namespace MovieSearch.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index(int genreId = 0)
+        public async Task<IActionResult> Index()
+        {
+            IQueryable<Movie> movies;
+            var viewModel = new MovieIndexViewModel();
+
+            movies = _context.Movies.Include(m => m.Genre);
+            viewModel.Genres = new SelectList(_context.MovieGenres, "Id", "Name");
+
+
+            viewModel.Movies = await movies.ToListAsync();
+
+            return View(viewModel);
+        }
+
+
+        public async Task<IActionResult> IndexSort(int genreId = 0)
         {
             IQueryable<Movie> movies;
             var viewModel = new MovieIndexViewModel();
@@ -57,7 +73,7 @@ namespace MovieSearch.Controllers
 
             viewModel.Movies = await movies.ToListAsync();
 
-            return View(viewModel);
+            return PartialView("_ViewAll", viewModel);
         }
 
         public async Task<IActionResult> IndexSearch(string searchValue)
@@ -75,7 +91,7 @@ namespace MovieSearch.Controllers
             viewModel.Genres = new SelectList(_context.MovieGenres, "Id", "Name");
             viewModel.Movies = await movies.ToListAsync();
 
-            return View("./Index", viewModel);
+            return PartialView("_ViewAll", viewModel);
         }
 
         // GET: Movies/Details/5
