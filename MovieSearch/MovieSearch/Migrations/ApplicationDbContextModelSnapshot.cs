@@ -339,6 +339,30 @@ namespace MovieSearch.Migrations
                     b.ToTable("MovieMarks");
                 });
 
+            modelBuilder.Entity("MovieSearch.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("MovieSearch.Models.ProfilePicture", b =>
                 {
                     b.Property<int>("Id")
@@ -494,6 +518,13 @@ namespace MovieSearch.Migrations
                         .HasForeignKey("UserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MovieSearch.Models.Notification", b =>
+                {
+                    b.HasOne("MovieSearch.Models.ApplicationUser", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("MovieSearch.Models.Review", b =>

@@ -13,5 +13,7 @@ namespace MovieSearch.ViewModels.Movies
 
         public string IsFavourite { get; set; }
 
+        public int ProfileId { get; set; }
+
     }
 }

@@ -144,5 +144,41 @@ namespace MovieSearch.ViewModels
 
             return View(viewModel);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddDeleteFavouriteMovie(int id, string returnUrl)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var userProfile = await _context.MoviesProfiles
+                    .Include(p => p.FavouriteMovies)
+                    .FirstOrDefaultAsync(p => p.UserId == userId);
+
+            var favMovie = await _context.FavouriteMovies.FirstOrDefaultAsync(f => f.MovieId == id);
+
+            string isFavourite;
+
+            //'Cause m2m between fav model and user profile
+            if (!userProfile.FavouriteMovies.Any(m => m.MovieId == favMovie.Id))
+            {
+                userProfile.FavouriteMovies.Add(new UserFavourites { MovieId = favMovie.Id, ProfileId = userProfile.Id });
+                isFavourite = "In Favourites";
+            }
+            else
+            {
+                var userFavMovie = userProfile.FavouriteMovies.FirstOrDefault(m => m.MovieId == favMovie.Id);
+                userProfile.FavouriteMovies.Remove(userFavMovie);
+                isFavourite = "Add Favourite ";
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json( new { isFavourite });
+
+            //if (string.IsNullOrEmpty(returnUrl))
+            //    return RedirectToAction("Details", "Movies", new { id = id });
+            //else return Redirect(returnUrl);
+        }
     }
 }

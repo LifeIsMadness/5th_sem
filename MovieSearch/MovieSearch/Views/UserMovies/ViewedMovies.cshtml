@@ -1,10 +1,10 @@
 ﻿@model MovieSearch.ViewModels.UserMovies.UserMoviesViewModel
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Viewed movies";
+    ViewData["Title"] = Localizer["ViewedMovies"];
     ViewData["ActivePage"] = "ViewedMovies";
 }
-
 
 @if (Model.ForCurrentUser)
 {
@@ -16,7 +16,7 @@
 else
 {
     <h4 style="margin-bottom:10px;">
-        @($"{Model.UserName}'s {ViewData["Title"].ToString().ToLower()}")
+        @($"{Model.UserName}'s {ViewBag.Title.Value.ToLower()}")
     </h4>
 }
 
@@ -25,22 +25,22 @@ else
     <thead class="thead-dark">
         <tr>
             <th>
-                @Html.DisplayName("Movie")
+                @Localizer["Movie"]
             </th>
             @if (Model.ForCurrentUser)
             {
                 <th>
-                    @Html.DisplayName("My mark")
+                    @Localizer["MyMark"]
                 </th>
             }
             else
             {
                 <th>
-                    @Html.DisplayName($"{Model.UserName}'s mark")
+                    @($"{Model.UserName}'s") @Localizer["Mark"].Value.ToLower() 
                 </th>
             }
             <th>
-                @Html.DisplayName("Rating")
+                @Localizer["Rating"]
             </th>
             <th>
             </th>
@@ -64,41 +64,43 @@ else
                 <td>
                     <rating class="rating-details">@item.Movie.OveralRating</rating>
                 </td>
-                @if (Model.ForCurrentUser)
-                {
-                    <td>
-                        <form asp-action="Vote" asp-controller="Vote">
+                @*@if (Model.ForCurrentUser)
+                    {
+                        <td>
+                            <form asp-action="Vote" asp-controller="Vote">
 
-                            <input type="hidden" asp-for="ReturnUrl" />
-                            <input type="hidden" name="Id" value="@item.Mark.Id" />
-                            <input type="hidden" name="MovieId" value="@item.Movie.Id" />
-                            <input type="hidden" name="UserProfileId" value="@item.Mark.UserProfileId" />
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" id="ddBtn">
-                                    Give a mark
-                                </button>
-                                <div class="dropdown-menu" style="min-width:14rem;" aria-labelledby="ddBtn">
-                                    <div class="dropdown-item star-rating" style="padding: 0;">
-                                        <div class="star-rating__wrap">
-                                            @for (int i = 10; i > 0; i--)
-                                            {
-                                                <input class="star-rating__input" id=@($"star-rating-{i}") type="radio" name="Value" asp-for="@item.Mark.Value" value=@($"{i}") onclick="this.form.submit()">
-                                                <label class="star-rating__ico fa fa-star-o fa-lg" style="margin-bottom:0;" for=@($"star-rating-{i}") title=@($"{i} out of 10 stars")></label>
-                                            }
+                                <input type="hidden" asp-for="ReturnUrl" />
+                                <input type="hidden" id="Mark_Id" name="Id" value="@item.Mark.Id" />
+                                <input type="hidden" id="Mark_MovieId" name="MovieId" value="@item.Movie.Id" />
+                                <input type="hidden" id="Mark_UserProfileId" name="UserProfileId" value="@item.Mark.UserProfileId" />
+                                <div class="dropdown">
+                                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" id="ddBtn">
+                                        Give a mark
+                                    </button>
+                                    <div class="dropdown-menu" style="min-width:14rem;" aria-labelledby="ddBtn">
+                                        <div class="dropdown-item star-rating" style="padding: 0;">
+                                            <div class="star-rating__wrap">
+                                                @for (int i = 1; i <= 10; i++)
+                                                {
+                                                    <input class="star-rating__input" id=@($"star-rating-{i}") type="radio" name="Value" asp-for="@item.Mark.Value" value=@($"{i}")>
+                                                    <label class="star-rating__ico fa fa-star-o fa-lg" style="margin-bottom:0;" for=@($"star-rating-{i}") title="@i of 10 "></label>
+                                                }
+                                                <i class="fa fa-times cancel-rating__input"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                        </form>
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        <a class="btn btn-info" title="@item.Movie.Name" asp-action="Details" asp-controller="Movies" asp-route-id="@item.Movie.Id">Rate it!</a>
-                    </td>
-                }
+                            </form>
+                        </td>
+                    }
+                    else
+                    {
+                        }*@
+                <td>
+                    <a class="btn btn-info" title="@item.Movie.Name" asp-action="Details" asp-controller="Movies" asp-route-id="@item.Movie.Id">@Localizer["Rate"]</a>
+                </td>
+
             </tr>
         }
     </tbody>

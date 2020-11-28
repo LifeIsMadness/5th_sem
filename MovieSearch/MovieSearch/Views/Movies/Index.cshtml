@@ -1,16 +1,11 @@
 ﻿@model MovieSearch.ViewModels.Movies.MovieIndexViewModel
+@inject IViewLocalizer Localizer
+
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = Localizer["Index"];
 }
 <link rel="stylesheet" href="~/css/dropdown.css" />
-
-@if (User.Identity.IsAuthenticated && User.IsInRole("SuperAdmin"))
-{<p>
-        <a class="btn btn-info" asp-action="Create">Create New</a>
-    </p>
-}
-
 
 
 <div id="view-all">

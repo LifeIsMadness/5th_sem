@@ -1,4 +1,4 @@
-﻿
+﻿@inject IViewLocalizer Localizer 
 
 <div class="div-m row">
     <p style="margin: 10px 5px 10px 10px;">
@@ -10,13 +10,22 @@
 
     <p style="margin: 10px 5px 10px 10px;">
         <input class="wrapper-dropdown-3-search" type="search" value="@ViewBag.SearchValue" name="searchValue" id="search_inp"
-               onkeyup="inputSearch(event)" placeholder="Search..." />
+               placeholder="@Localizer["Search"]" />
         <button class="button-search" type="button" onclick="searchMovie()" value="Search"></button>
     </p>
 </div>
 
-<h1>All movies</h1>
-<div class="row mt-5 mb-2">
+<div>
+    @if (User.Identity.IsAuthenticated && User.IsInRole("SuperAdmin"))
+    {
+        <p style="text-align:center;">
+            <a class="btn btn-info" asp-action="Create">@Localizer["Create"]</a>
+        </p>
+    }
+    <h1 style="margin-top:6px;">@Localizer["All movies"]</h1>
+</div>
+
+<div class="row mt-3 mb-2">
     @foreach (var item in Model.Movies)
     {
         <div class="col-lg-4 mt-lg-2 bordered">

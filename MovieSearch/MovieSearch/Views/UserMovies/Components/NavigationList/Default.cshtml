@@ -1,12 +1,13 @@
 ﻿@model MovieSearch.ViewModels.UserMovies.UserMoviesNavigationViewModel
 
+
 <ul class="nav nav-pills-o flex-column">
     <li class="nav-item">
         <a class="nav-link @(string.Equals(Model.ActivePage, Model.Index, StringComparison.OrdinalIgnoreCase) ? "active" : null)"
-           id="favMovies" asp-action="Favourites" asp-route-userId="@Model.UserId">Favourites</a>
+           id="favMovies" asp-action="Favourites" asp-route-userId="@Model.UserId">@Localizer["Favourites"]</a>
     </li>
     <li class="nav-item">
         <a class="nav-link @(string.Equals(Model.ActivePage, Model.ViewedMovies, StringComparison.OrdinalIgnoreCase) ? "active" : null)"
-           id="viewedMovies" asp-action="ViewedMovies" asp-route-userId="@Model.UserId">Viewed movies</a>
+           id="viewedMovies" asp-action="ViewedMovies" asp-route-userId="@Model.UserId">@Localizer["Viewed movies"]</a>
     </li>
 </ul>

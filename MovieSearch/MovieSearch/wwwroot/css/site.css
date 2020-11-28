@@ -191,3 +191,28 @@ img.profile_avatar {
     object-fit: cover;
     border-radius: 30px;
 }
+
+.notification-count{
+    top: 14px;
+    position: relative;
+    cursor: pointer;
+}
+
+.popover{
+    width: 500px;
+    cursor: pointer;
+}
+
+.notification-date{
+    font-style:italic;
+    text-align:right;
+    margin-bottom:5px;
+    color:green;
+}
+
+.notification-text-p {
+    font-family: Arial, Tahoma, Verdana;
+    background-color:#F9F0DA;
+    border-radius:10px;
+    padding:10px;
+}

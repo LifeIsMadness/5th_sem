@@ -1,12 +1,13 @@
 ﻿@model MovieSearch.ViewModels.Movies.MovieEditViewModel
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = Localizer["Create"];
 }
 
-<h1>Create</h1>
+<h1>ViewData["Title"]</h1>
 
-<h4>Movie</h4>
+<h4>Localizer["Movie"]</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -24,7 +25,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Movie.Title" class="control-label"></label>
-                <textarea asp-for="Movie.Title" class="form-control" > </textarea>
+                <textarea asp-for="Movie.Title" class="form-control"> </textarea>
                 <span asp-validation-for="Movie.Title" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -39,7 +40,7 @@
             </div>
             <div class="form-group">
                 <label for="GenreId" class="control-label">Genre</label>
-                <select asp-for="Movie.GenreId" class ="form-control" asp-items="Model.Genres"></select>
+                <select asp-for="Movie.GenreId" class="form-control" asp-items="Model.Genres"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -49,7 +50,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">@Localizer["Back"]</a>
 </div>
 
 @section Scripts {

@@ -50,6 +50,7 @@ namespace MovieSearch.Controllers
         }
 
 
+        [NoDirectAccess]
         public async Task<IActionResult> IndexSort(int genreId = 0)
         {
             IQueryable<Movie> movies;
@@ -58,11 +59,9 @@ namespace MovieSearch.Controllers
             if (genreId > 0)
             {
                 movies = _context.Movies.Include(m => m.Genre).Where(m => m.GenreId == genreId);
-                if (movies == null)
-                    return NotFound();
 
-                var genre = await _context.MovieGenres.FindAsync(genreId);
-                viewModel.Genres = new SelectList(_context.MovieGenres, "Id", "Name", genre.Id);
+                //var genre = await _context.MovieGenres.FindAsync(genreId);
+                viewModel.Genres = new SelectList(_context.MovieGenres, "Id", "Name", genreId);
 
             }
             else
@@ -76,6 +75,7 @@ namespace MovieSearch.Controllers
             return PartialView("_ViewAll", viewModel);
         }
 
+        [NoDirectAccess]
         public async Task<IActionResult> IndexSearch(string searchValue)
         {
             IQueryable<Movie> movies = _context.Movies.Include(m => m.Genre);
@@ -115,6 +115,7 @@ namespace MovieSearch.Controllers
 
             var userId = _userManager.GetUserId(User);
 
+
             var viewModel = new MovieDetailsViewModel { Movie = movie };
             viewModel.Reviews = _context.Reviews
                 .AsNoTracking()
@@ -125,6 +126,9 @@ namespace MovieSearch.Controllers
 
             if (userId != null)
             {
+                var profileId = (await _context.MoviesProfiles.FirstOrDefaultAsync(p => p.UserId == userId)).Id;
+                viewModel.ProfileId = profileId;
+
                 var mark = await _context.MovieMarks
                     .AsNoTracking()
                     .FirstOrDefaultAsync(m =>

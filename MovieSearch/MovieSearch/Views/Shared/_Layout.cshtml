@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject IViewLocalizer Localizer
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -22,10 +24,10 @@
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Movies" asp-action="Index">Home</a>
+                            <a class="nav-link text-white" asp-controller="Movies" asp-action="Index">@Localizer["Home"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-white" asp-controller="Home" asp-action="Privacy">@Localizer["Privacy"]</a>
                         </li>
                     </ul>
                 </div>
@@ -38,12 +40,19 @@
         </main>
     </div>
     <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2020 - MovieSearch - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <div class="row">
+            <div class="col-sm-6 text-center">
+                &copy; 2020 - MovieSearch - <a asp-area="" asp-controller="Home" asp-action="Privacy">@Localizer["Privacy"]</a>
+            </div>
+            <div class="col-sm-6 text-center">
+                <partial name="_SelectLanguagePartial" />
+            </div>
         </div>
+
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>

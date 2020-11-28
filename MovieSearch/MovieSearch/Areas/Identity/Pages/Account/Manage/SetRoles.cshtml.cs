@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using MovieSearch.Data;
+using MovieSearch.Hubs;
 using MovieSearch.Models;
 
 namespace MovieSearch.Areas.Identity.Pages.Account.Manage
@@ -16,11 +19,19 @@ namespace MovieSearch.Areas.Identity.Pages.Account.Manage
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context;
+        private readonly IHubContext<SignalRServer> _hubContext;
 
-        public SetRolesModel(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public SetRolesModel(
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext context,
+            IHubContext<SignalRServer> hubContext)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _context = context;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -34,7 +45,7 @@ namespace MovieSearch.Areas.Identity.Pages.Account.Manage
             public bool Selected { get; set; }
         }
 
-        
+
         //public class SetRolesViewModel
         //{
         //    public List<RoleViewModel> Roles { get; set; }
@@ -78,7 +89,7 @@ namespace MovieSearch.Areas.Identity.Pages.Account.Manage
             if (user == null)
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 
-            if(await _userManager.IsInRoleAsync(user, Roles.SuperAdmin.ToString()))
+            if (await _userManager.IsInRoleAsync(user, Roles.SuperAdmin.ToString()))
             {
                 ModelState.AddModelError("", "Cannot remove role \"superadmin\" ");
                 return Page();
@@ -92,7 +103,24 @@ namespace MovieSearch.Areas.Identity.Pages.Account.Manage
             result = await _userManager.AddToRolesAsync(user, AllRoles.Where(r => r.Selected).Select(r => r.RoleName));
             if (!result.Succeeded)
                 ModelState.AddModelError("", "Cannot add selected roles to user");
+            else
+            {
+                //TODO: Send notification with updated roles.
+                _context.Notifications.Add(new Notification
+                {
+                    User = user,
+                    Date = DateTime.Now,
+                    Text =
+                    "Your roles have been updated.\n"
+                    + "Your roles now: "
+                    + string.Join(", ", await _userManager.GetRolesAsync(user))
+                });
 
+                //TODO: Change count of notifications in span dynamically.
+                await _hubContext.Clients.User(user.Id).SendAsync("notifyUser");
+            }
+
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./ManageRoles");
         }

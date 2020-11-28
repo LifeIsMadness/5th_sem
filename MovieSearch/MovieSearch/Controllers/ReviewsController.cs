@@ -31,12 +31,12 @@ namespace MovieSearch.Controllers
             _userManager = userManager;
         }
 
-        // GET: Reviews
-        public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.Reviews.Include(r => r.Movie).Include(r => r.UserProfile);
-            return View(await applicationDbContext.ToListAsync());
-        }
+        //// GET: Reviews
+        //public async Task<IActionResult> Index()
+        //{
+        //    var applicationDbContext = _context.Reviews.Include(r => r.Movie).Include(r => r.UserProfile);
+        //    return View(await applicationDbContext.ToListAsync());
+        //}
 
         // GET: Reviews/Create
         public async Task<IActionResult> Create(int? movieId)
@@ -53,6 +53,10 @@ namespace MovieSearch.Controllers
 
             ViewData["MovieId"] = movieId;
             ViewData["UserProfileId"] = userProfile.Id;
+
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == movieId);
+            ViewData["MovieInfo"] = string.Format("{0}({1})", movie.Name, movie.Year);
+
 
             return View();
         }
@@ -76,6 +80,9 @@ namespace MovieSearch.Controllers
             ViewData["MovieId"] = review.MovieId;
             ViewData["UserProfileId"] = review.UserProfileId;
 
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == review.MovieId);
+            ViewData["MovieInfo"] = string.Format("{0}({1})", movie.Name, movie.Year);
+
             return View(review);
         }
 
@@ -95,6 +102,10 @@ namespace MovieSearch.Controllers
 
             ViewData["MovieId"] = review.MovieId;
             ViewData["UserProfileId"] = review.UserProfileId;
+
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == review.MovieId);
+            ViewData["MovieInfo"] = string.Format("{0}({1})", movie.Name, movie.Year);
+
             return View(review);
         }
 
@@ -114,6 +125,7 @@ namespace MovieSearch.Controllers
             {
                 try
                 {
+                    review.Date = DateTime.Now;
                     _context.Update(review);
                     await _context.SaveChangesAsync();
                 }
@@ -132,6 +144,10 @@ namespace MovieSearch.Controllers
             }
             ViewData["MovieId"] = review.MovieId;
             ViewData["UserProfileId"] = review.UserProfileId;
+
+
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == review.MovieId);
+            ViewData["MovieInfo"] = string.Format("{0}({1})", movie.Name, movie.Year);
             return View(review);
         }
 

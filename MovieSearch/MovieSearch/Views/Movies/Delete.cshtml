@@ -1,42 +1,43 @@
 ﻿@model MovieSearch.Models.Movie
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = Localizer["Delete"];
 }
 
-<h1>Delete</h1>
+<h1>@ViewData["Title"]</h1>
 
-<h3>Are you sure you want to delete this?</h3>
+<h3>@Localizer["Sure"]</h3>
 <div>
-    <h4>Movie</h4>
+    <h4>@Localizer["Movie"]</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            @Localizer["Name"]
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Year)
+            @Localizer["Year"]
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Year)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Country)
+            @Localizer["Country"]
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Country)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OveralRating)
+            @Localizer["OveralRating"]
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OveralRating)
+            <rating class="rating-details">@Model.OveralRating</rating>
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Genre)
+            @Localizer["Genre"]
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Genre.Name)
@@ -45,7 +46,7 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <input type="submit" value="@Localizer["Delete"]" class="btn btn-danger" />
+        <a asp-action="Index" class="btn badge-primary">@Localizer["Back"]</a>
     </form>
 </div>

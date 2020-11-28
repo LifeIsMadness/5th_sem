@@ -2,22 +2,28 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
+@inject IViewLocalizer Localizer
+
+<span id="copyMsg" style="color:green;">@Localizer["Link"]</span>
 @if (Model.ForCurrentUser)
 {
-    <h2>Manage your movie's profile</h2>
+
+    <h2>@Localizer["Manage"] <strong id="profileLink" style="color: blue"><u>@Localizer["Your"]</u></strong> @Localizer["Profile"]</h2>
 }
 else
 {
-    <h2>@($"{Model.UserName}'s") movie's profile</h2>
+    <h2><strong id="profileLink" style="color: blue"><u>@($"{Model.UserName}'s")</u></strong> @Localizer["Profile"]</h2>
 }
+
 <div>
     @if (Model.ForCurrentUser)
     {
-        <h4>Browse your favourite movies</h4>
+
+        <h4>@Localizer["Browse"] @Localizer["Your2"] @Localizer["Favourite movies"]</h4>
     }
     else
     {
-        <h4>Browse @($"{Model.UserName}'s") favourite movies</h4>
+        <h4>@Localizer["Browse"] @($"{Model.UserName}'s") @Localizer["Favourite movies"]</h4>
     }
     <hr />
     <div class="row">
@@ -32,4 +38,23 @@ else
 
 @section Scripts {
     @RenderSection("Scripts", required: false)
+    <script type="text/javascript">
+        $(function () {
+            $('#copyMsg').hide();
+
+            $('#profileLink').click(function () {
+                console.log('profileLink clicked');
+                console.log(window.location.href);
+
+                navigator.clipboard.writeText(window.location.href)
+                    .then(() => {
+                        $('#copyMsg').fadeToggle(300).delay(300).fadeToggle(500);
+
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            });
+        });
+    </script>
 }

@@ -7,14 +7,14 @@
     font-size: 1rem;
 }
 
-    .star-rating__wrap:after {
+/*    .star-rating__wrap:after {
         content: "";
         display: table;
         clear: both;
-    }
+    }*/
 
 .star-rating__ico {
-    float: right;
+    float: left;
     padding-left: 2px;
     cursor: pointer;
     color: #FFB300;
@@ -28,8 +28,16 @@
     display: none;
 }
 
-    .star-rating__ico:hover:before,
+    /*.star-rating__ico:hover:before,
     .star-rating__ico:hover ~ .star-rating__ico:before,
     .star-rating__input:checked ~ .star-rating__ico:before {
         content: "\f005";
-    }
+    }*/
+
+.cancel-rating__input {
+    color: red;
+    cursor: pointer;
+    padding-left: 2px;
+    vertical-align: top;
+}
+

@@ -13,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MovieSearch.Models;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+using MovieSearch.Hubs;
 
 namespace MovieSearch
 {
@@ -37,10 +40,21 @@ namespace MovieSearch
                 .AddDefaultTokenProviders()
                 .AddDefaultUI();
 
-            services.AddControllersWithViews();
-            services.AddRazorPages();
 
-            
+            services.AddControllersWithViews()
+                .AddMvcLocalization();
+
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new RequestCulture("ru");
+                options.SupportedCultures = new[] { new CultureInfo("en"), new CultureInfo("ru") };
+                options.SupportedUICultures = new[] { new CultureInfo("en"), new CultureInfo("ru") };
+            });
+
+
+            services.AddRazorPages();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,7 +67,7 @@ namespace MovieSearch
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Shared/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -61,6 +75,8 @@ namespace MovieSearch
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseRequestLocalization();
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -72,8 +88,9 @@ namespace MovieSearch
                     pattern: "{controller}/{action=Index}/{id?}");
 
                 endpoints.MapRazorPages();
+                endpoints.MapHub<SignalRServer>("srServer");
             });
-            
+
         }
     }
 }

@@ -19,5 +19,7 @@ namespace MovieSearch.Models
         [ForeignKey("ProfilePictureId")]
         public ProfilePicture ProfilePicture { get; set; }
 
+        public List<Notification> Notifications { get; set; }
+
     }
 }

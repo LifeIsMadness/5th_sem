@@ -13,6 +13,7 @@ namespace MovieSearch.Models
     {
         public int Id { get; set; }
 
+        [Display(Name = "Name")]
         [Required]
         public string Name { get; set; }
 
