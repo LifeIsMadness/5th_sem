@@ -1,0 +1,65 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dbserver_moviesearchdbserver_name": {
+      "type": "string"
+    },
+    "dbserver_moviesearchdbserver_adminlogin": {
+      "type": "string"
+    },
+    "dbserver_moviesearchdbserver_adminpassword": {
+      "type": "securestring"
+    },
+    "dbserver_moviesearchdbserver_location": {
+      "type": "string"
+    },
+    "dbserver_moviesearchdbserver_MovieSearch_db_name": {
+      "type": "string"
+    },
+    "dbserver_moviesearchdbserver_MovieSearch_db_location": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "location": "[parameters('dbserver_moviesearchdbserver_location')]",
+      "name": "[parameters('dbserver_moviesearchdbserver_name')]",
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2014-04-01-preview",
+      "properties": {
+        "administratorLogin": "[parameters('dbserver_moviesearchdbserver_adminlogin')]",
+        "administratorLoginPassword": "[parameters('dbserver_moviesearchdbserver_adminpassword')]"
+      },
+      "resources": [
+        {
+          "location": "[parameters('dbserver_moviesearchdbserver_location')]",
+          "name": "AllowAllAzureIPs",
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('dbserver_moviesearchdbserver_name'))]"
+          ],
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "location": "[parameters('dbserver_moviesearchdbserver_MovieSearch_db_location')]",
+          "name": "[parameters('dbserver_moviesearchdbserver_MovieSearch_db_name')]",
+          "type": "databases",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('dbserver_moviesearchdbserver_name'))]"
+          ],
+          "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "edition": "Standard",
+            "maxSizeBytes": "1073741824"
+          }
+        }
+      ]
+    }
+  ]
+}

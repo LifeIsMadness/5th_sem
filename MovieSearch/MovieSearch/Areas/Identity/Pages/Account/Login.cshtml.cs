@@ -22,7 +22,7 @@ namespace MovieSearch.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, 
+        public LoginModel(SignInManager<ApplicationUser> signInManager,
             ILogger<LoginModel> logger,
             UserManager<ApplicationUser> userManager)
         {
@@ -82,12 +82,15 @@ namespace MovieSearch.Areas.Identity.Pages.Account
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
 
                 var user = await _userManager.FindByEmailAsync(Input.Email);
-  
-
+                if (user == null)
+                {
+                    _logger.LogError($"No such user user '{Input.Email}'");
+                    return NotFound($"No such user user '{Input.Email}'.");
+                }
                 var result = await _signInManager.PasswordSignInAsync(user, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
+                    _logger.LogInformation($"User logged in: {user.Email}.");
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -102,6 +105,7 @@ namespace MovieSearch.Areas.Identity.Pages.Account
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    _logger.LogError($"Invalid login attempt.");
                     return Page();
                 }
             }

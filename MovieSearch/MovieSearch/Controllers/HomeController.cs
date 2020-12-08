@@ -38,11 +38,15 @@ namespace MovieSearch.Controllers
         [HttpPost]
         public IActionResult SetLanguage(string culture, string returnUrl)
         {
+            _logger.LogInformation($"Response for the new culture: {culture}");
+
             Response.Cookies.Append(
                 CookieRequestCultureProvider.DefaultCookieName,
                 CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
                 new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
             );
+
+
 
             return LocalRedirect(returnUrl);
         }

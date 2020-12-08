@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MovieSearch.Data;
 using MovieSearch.Models;
+using Azure.Identity;
 
 namespace MovieSearch
 {
@@ -43,9 +44,24 @@ namespace MovieSearch
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                //.ConfigureAppConfiguration((context, config) =>
+                //{
+                //var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+                //config.AddAzureKeyVault(
+                //keyVaultEndpoint,
+                //new DefaultAzureCredential());
+                //})
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    var a = Environment.GetEnvironmentVariables();
                     webBuilder.UseStartup<Startup>();
+                })
+                
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddConsole();
+                  
                 });
+                
     }
 }

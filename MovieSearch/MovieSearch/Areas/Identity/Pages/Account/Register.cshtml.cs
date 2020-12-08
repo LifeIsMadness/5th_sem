@@ -84,6 +84,7 @@ namespace MovieSearch.Areas.Identity.Pages.Account
                 if (await _userManager.FindByEmailAsync(Input.Email) != null)
                 {
                     ModelState.AddModelError(string.Empty, "The email already exists");
+                    _logger.LogError($"The email already exists {Input.Email}");
                     return Page();
                 }
 
@@ -91,9 +92,10 @@ namespace MovieSearch.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
-                    CreateProfile(user);
-
                     _logger.LogInformation("User created a new account with password.");
+                    CreateProfile(user);
+                    _logger.LogInformation($"Created profile with movies for '{user.UserName}'");
+
                     await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

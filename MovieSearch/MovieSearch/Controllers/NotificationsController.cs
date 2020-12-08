@@ -50,6 +50,8 @@ namespace MovieSearch.Controllers
             _context.Notifications.Remove(notification);
             await _context.SaveChangesAsync();
 
+            _logger.LogInformation("Notification {0} was read", id);
+
             return Ok();
         }
     }

@@ -89,6 +89,8 @@ namespace MovieSearch.Areas.Identity.Pages.Account.Manage
             if (user == null)
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 
+
+
             if (await _userManager.IsInRoleAsync(user, Roles.SuperAdmin.ToString()))
             {
                 ModelState.AddModelError("", "Cannot remove role \"superadmin\" ");

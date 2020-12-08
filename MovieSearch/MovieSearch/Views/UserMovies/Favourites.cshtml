@@ -61,7 +61,7 @@
 
                             <input type="hidden" name="id" value="@item.Movie.Id" />
                             <input type="hidden" asp-for="ReturnUrl" />
-                            <button type="button" class="btn btn-info btn-fav">@Localizer["Delete"]</button>
+                            <button type="button" data-fav="Delete" class="btn btn-info btn-fav">@Localizer["Delete"]</button>
                             @*<input type="submit" value="Delete" class="btn btn-info" />*@
                         </form>
                     </td>

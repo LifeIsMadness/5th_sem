@@ -16,6 +16,9 @@ using MovieSearch.Models;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using MovieSearch.Hubs;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using MovieSearch.Services;
+using Microsoft.Extensions.Logging;
 
 namespace MovieSearch
 {
@@ -31,9 +34,21 @@ namespace MovieSearch
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(
+                        Configuration.GetConnectionString("DefaultConnection")));
+            }
+            else
+            {
+             
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(
+                        Configuration.GetConnectionString("AzureDb")
+                        ));
+            }
+
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -55,11 +70,24 @@ namespace MovieSearch
 
             services.AddRazorPages();
             services.AddSignalR();
+
+            services.AddTransient<IEmailSender, EmailSender>(options =>
+                new EmailSender(
+                    Configuration["EmailSender:Host"],
+                    Configuration.GetValue<int>("EmailSender:Port"),
+                    Configuration["EmailSender:User"],
+                    Configuration["EmailSender:Password"]
+                )
+            );
+
+            services.Configure<ApplicationDbContext>(options => { options.Database.Migrate(); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddProvider(new MovieSearch.Logger.FileLoggerProvider());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

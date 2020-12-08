@@ -82,13 +82,17 @@ namespace MovieSearch.ViewModels
 
             var marks = userProfile.Marks.OrderBy(m => m.Movie.Name);
 
-            var markedMovies = marks.Select(m => m.Movie);
+            var favouritesMarks = marks
+                .Where((m) => { return favourites.Any(mv => mv.Id == m.MovieId); })
+                .OrderBy(m => m.Movie.Name);
 
-            var unmarkedMovies = favourites.Except(markedMovies, new MovieComparer());
+            var markedFavourites = favouritesMarks.Select(m => m.Movie);
 
-            var moviesAndMarks = favourites.Zip(marks).ToList();
+            var unmarkedFavourites = favourites.Except(markedFavourites, new MovieComparer());
 
-            foreach (var movie in unmarkedMovies)
+            var moviesAndMarks = markedFavourites.Zip(favouritesMarks).ToList();
+
+            foreach (var movie in unmarkedFavourites)
             {
                 moviesAndMarks.Add((movie, null));
             }

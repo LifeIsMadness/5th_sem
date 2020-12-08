@@ -31,13 +31,6 @@ namespace MovieSearch.Controllers
             _userManager = userManager;
         }
 
-        //// GET: Reviews
-        //public async Task<IActionResult> Index()
-        //{
-        //    var applicationDbContext = _context.Reviews.Include(r => r.Movie).Include(r => r.UserProfile);
-        //    return View(await applicationDbContext.ToListAsync());
-        //}
-
         // GET: Reviews/Create
         public async Task<IActionResult> Create(int? movieId)
         {
@@ -74,6 +67,9 @@ namespace MovieSearch.Controllers
                 _context.Add(review);
                 
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Review for a movie `{0}` was written", review.MovieId);
+
                 return RedirectToAction("Details", "Movies", new { id = review.MovieId });
             }
 
@@ -128,6 +124,8 @@ namespace MovieSearch.Controllers
                     review.Date = DateTime.Now;
                     _context.Update(review);
                     await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Review for a movie `{0}` was edited", review.MovieId);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -168,6 +166,7 @@ namespace MovieSearch.Controllers
                 return NotFound();
             }
 
+
             return View(review);
         }
 
@@ -186,6 +185,8 @@ namespace MovieSearch.Controllers
                 || await _userManager.IsInRoleAsync(user, "SuperAdmin")
                 || await _userManager.IsInRoleAsync(user, "Moderator"))
             {
+                _logger.LogInformation("User `{0}` removed  Review `{1}`", user.Email, id);
+
                 _context.Reviews.Remove(review);
                 await _context.SaveChangesAsync();
 

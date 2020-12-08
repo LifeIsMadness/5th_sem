@@ -234,7 +234,7 @@ $(document).ready(function () {
             url: this.form.action,
             data: _btn.closest("form").serialize(),
             success: function (res) {
-                if (_btn.html() == "Delete") {
+                if (_btn.data("fav") == "Delete") {
                     _btn.closest("tr").remove();
                 }
                 else {

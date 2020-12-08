@@ -21,12 +21,12 @@ namespace MovieSearch.Controllers
     [Authorize]
     public class MarksApiController : ControllerBase
     {
-        private readonly ILogger<VoteController> _logger;
+        private readonly ILogger<MarksApiController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public MarksApiController(
-            ILogger<VoteController> logger,
+            ILogger<MarksApiController> logger,
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager)
         {
