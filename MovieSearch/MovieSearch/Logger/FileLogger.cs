@@ -37,7 +37,7 @@ namespace MovieSearch.Logger
             var msg = DateTime.Now + ":" + formatter(state, exception);
 
             File.AppendAllText(_allLogsPath, msg + Environment.NewLine);
-            Console.WriteLine($"{msg}");
+           // Console.WriteLine($"{msg}");
         }
     }
 }

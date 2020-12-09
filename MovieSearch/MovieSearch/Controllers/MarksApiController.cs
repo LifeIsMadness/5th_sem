@@ -164,6 +164,8 @@ namespace MovieSearch.Controllers
 
             movie.OveralRating = (float)Math.Round(movie.OveralRating, 3);
 
+            _logger.Log(LogLevel.Information, "{0} overall rating updated: {1}", movie.Name, movie.OveralRating);
+
             _context.Movies.Update(movie);
 
             return movie.OveralRating;

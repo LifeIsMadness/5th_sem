@@ -167,22 +167,24 @@ namespace MovieSearch.ViewModels
             if (!userProfile.FavouriteMovies.Any(m => m.MovieId == favMovie.Id))
             {
                 userProfile.FavouriteMovies.Add(new UserFavourites { MovieId = favMovie.Id, ProfileId = userProfile.Id });
+
                 isFavourite = "In Favourites";
+
+                _logger.LogInformation("User `{0}` has added Movie {1} or fav {2} to his favourites", userId, id, favMovie.Id);
             }
             else
             {
                 var userFavMovie = userProfile.FavouriteMovies.FirstOrDefault(m => m.MovieId == favMovie.Id);
                 userProfile.FavouriteMovies.Remove(userFavMovie);
                 isFavourite = "Add Favourite ";
+
+                _logger.LogInformation("User `{0}` has removed Movie {1} or fav {2} from his favourites", userId, id, favMovie.Id);
             }
 
             await _context.SaveChangesAsync();
 
             return Json( new { isFavourite });
 
-            //if (string.IsNullOrEmpty(returnUrl))
-            //    return RedirectToAction("Details", "Movies", new { id = id });
-            //else return Redirect(returnUrl);
         }
     }
 }
