@@ -68,6 +68,7 @@ function reDraw(_div) {
     else {
         drawStars(_div);
     }
+
 }
 
 function addMark(_form) {
@@ -161,11 +162,13 @@ function getNotifications() {
                 $("#notificationCount").popover('hide');
             }
 
+            var culture = $("form#selectLanguage").find("select").val();
+            var offset = new Date().getTimezoneOffset();
             var notifications = result.userNotifications;
             notifications.forEach(element => {
                 res = res + "<li class='list-group-item notification-text' "
-                    +'data-id="' + element.id + '">'
-                    + '<p class="notification-date">' + new Date(element.date).toLocaleString() + "</p>"
+                    + 'data-id="' + element.id + '">'
+                    + '<p class="notification-date">' + new Date(new Date(element.date) * 1 - (offset * 60 * 1000)).toLocaleString(culture) + "</p>"
                     + '<p class="notification-text-p">' + element.text + "</p>" + "</li>";
             });
 
@@ -184,6 +187,13 @@ function getNotifications() {
 $(document).ready(function () {
 
     reDraw();
+
+    var culture = $("form#selectLanguage").find("select").val();
+
+    var offset = new Date().getTimezoneOffset();
+    $(".date").each((i, val) => {
+        $(val).html(new Date(new Date($(val).html()) * 1 - offset * 60 * 1000).toLocaleString(culture));
+    });
 
     $("#view-all").delegate(".wrapper-dropdown-3-search", "keyup", function (e) {
         if (e.keyCode == 13) {

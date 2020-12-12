@@ -43,12 +43,14 @@ namespace MovieSearch.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "FieldRequired")]
+            [Display(Name = "Email")]
             [EmailAddress]
             public string Email { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "FieldRequired")]
             [DataType(DataType.Password)]
+            [Display(Name = "Password")]
             public string Password { get; set; }
 
             [Display(Name = "Remember me?")]

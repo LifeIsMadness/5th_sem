@@ -117,37 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="About" xml:space="preserve">
-    <value>О фильме</value>
-  </data>
-  <data name="Add Favourite" xml:space="preserve">
-    <value>В избранное</value>
-  </data>
   <data name="Back" xml:space="preserve">
-    <value>К списку</value>
-  </data>
-  <data name="Delete" xml:space="preserve">
-    <value>Удалить</value>
-  </data>
-  <data name="Description" xml:space="preserve">
-    <value>Обзор</value>
-  </data>
-  <data name="Details" xml:space="preserve">
-    <value>Описание фильма</value>
+    <value>Back to List</value>
   </data>
   <data name="Edit" xml:space="preserve">
-    <value>Изменить</value>
+    <value>Edit</value>
   </data>
-  <data name="In Favourites" xml:space="preserve">
-    <value>В избранном</value>
-  </data>
-  <data name="Rating" xml:space="preserve">
-    <value>Рейтинг</value>
-  </data>
-  <data name="Reviews" xml:space="preserve">
-    <value>Рецензии</value>
-  </data>
-  <data name="Write" xml:space="preserve">
-    <value>Добавить</value>
+  <data name="Movie" xml:space="preserve">
+    <value>Movie</value>
   </data>
 </root>

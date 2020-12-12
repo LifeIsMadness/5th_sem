@@ -13,6 +13,7 @@ using MovieSearch.Data;
 using MovieSearch.Models;
 using MovieSearch.ViewModels.Movies;
 using MovieSearch.RenderHelper;
+using Microsoft.Extensions.Localization;
 
 namespace MovieSearch.Controllers
 {
@@ -24,14 +25,18 @@ namespace MovieSearch.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
 
+        private readonly IStringLocalizer<MoviesController> _localizer;
+
         public MoviesController(
             ILogger<MoviesController> logger,
             ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IStringLocalizer<MoviesController> localizer)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
+            _localizer = localizer;
         }
 
         // GET: Movies
@@ -95,13 +100,11 @@ namespace MovieSearch.Controllers
         }
 
         // GET: Movies/Details/5
-        //TODO: Refactoring
-        //details view
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return NotFoundWithLogger(nameof(id));
             }
 
             var movie = await _context.Movies
@@ -110,7 +113,7 @@ namespace MovieSearch.Controllers
 
             if (movie == null)
             {
-                return NotFound();
+                return NotFoundWithLogger(nameof(movie));
             }
 
             var userId = _userManager.GetUserId(User);
@@ -137,8 +140,8 @@ namespace MovieSearch.Controllers
                 bool isFavourite = IsFavouriteMovie(userId, movie.Id);
 
                 viewModel.Mark = mark;
-                if (isFavourite) viewModel.IsFavourite = "In Favourites";
-                else viewModel.IsFavourite = "Add Favourite";
+                if (isFavourite) viewModel.IsFavourite = _localizer["In Favourites"];
+                else viewModel.IsFavourite = _localizer["Add Favourite"];
             }
 
             return View(viewModel);
@@ -198,13 +201,13 @@ namespace MovieSearch.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return NotFoundWithLogger(nameof(id));
             }
 
             var movie = await _context.Movies.Include(m => m.Genre).FirstOrDefaultAsync(m => m.Id == id);
             if (movie == null)
             {
-                return NotFound();
+                return NotFoundWithLogger(nameof(movie));
             }
 
             MovieEditViewModel viewModel = new MovieEditViewModel
@@ -240,7 +243,7 @@ namespace MovieSearch.Controllers
                 {
                     if (!MovieExists(movie.Id))
                     {
-                        return NotFound();
+                        return NotFoundWithLogger(nameof(movie));
                     }
                     else
                     {
@@ -266,7 +269,9 @@ namespace MovieSearch.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                //_logger.LogError("Movie with id {0} not found in the database", id);
+                //return NotFound();
+                return NotFoundWithLogger(nameof(id));
             }
 
             var movie = await _context.Movies
@@ -274,7 +279,9 @@ namespace MovieSearch.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (movie == null)
             {
-                return NotFound();
+                //_logger.LogError("Movie with id {0} not found in the database", id);
+                //return NotFound();
+                return NotFoundWithLogger(nameof(movie));
             }
 
             return View(movie);
@@ -295,7 +302,16 @@ namespace MovieSearch.Controllers
 
         private bool MovieExists(int id)
         {
+
             return _context.Movies.Any(e => e.Id == id);
+        }
+
+        public NotFoundResult NotFoundWithLogger(string name)
+        {
+
+            _logger.LogError("{0} not found", name);
+
+            return NotFound();
         }
 
     }

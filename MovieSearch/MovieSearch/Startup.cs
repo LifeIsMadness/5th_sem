@@ -19,6 +19,7 @@ using MovieSearch.Hubs;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using MovieSearch.Services;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace MovieSearch
 {
@@ -42,7 +43,7 @@ namespace MovieSearch
             }
             else
             {
-             
+
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(
                         Configuration.GetConnectionString("AzureDb")
@@ -57,9 +58,18 @@ namespace MovieSearch
 
 
             services.AddControllersWithViews()
-                .AddMvcLocalization();
+                .AddMvcLocalization(
+                viewOptions => { viewOptions.ResourcesPath = "Resources"; },
+                annotationsOptions =>
+                {
+                    annotationsOptions.DataAnnotationLocalizerProvider = (type, factory) =>
+                    {
+                        var assemblyName = new AssemblyName(typeof(Resources.CommonResources).GetTypeInfo().Assembly.FullName);
+                        return factory.Create(nameof(Resources.CommonResources), assemblyName.Name);
+                    };
+                });
 
-            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            //services.AddLocalization(options => options.ResourcesPath = "Resources");
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new RequestCulture("ru");
@@ -82,7 +92,7 @@ namespace MovieSearch
 
             services.Configure<ApplicationDbContext>(options => { options.Database.Migrate(); });
 
-            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -61,7 +61,7 @@ namespace MovieSearch.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Content,Date,UserProfileId,MovieId")] Review review)
         {
-            review.Date = DateTime.Now;
+            review.Date = DateTime.UtcNow;
             if (ModelState.IsValid)
             {
                 _context.Add(review);
@@ -121,7 +121,7 @@ namespace MovieSearch.Controllers
             {
                 try
                 {
-                    review.Date = DateTime.Now;
+                    review.Date = DateTime.UtcNow;
                     _context.Update(review);
                     await _context.SaveChangesAsync();
 

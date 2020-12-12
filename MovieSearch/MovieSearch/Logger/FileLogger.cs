@@ -10,9 +10,12 @@ namespace MovieSearch.Logger
     public class FileLogger : ILogger
     {
         private readonly string _allLogsPath;
+        private readonly string _errorsPath;
+
         public FileLogger()
         {
-            _allLogsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logging", "all");
+            _allLogsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logging", "all.txt");
+            _errorsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logging", "errors.txt");
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -34,10 +37,15 @@ namespace MovieSearch.Logger
         {
             if (!IsEnabled(logLevel)) return;
 
-            var msg = DateTime.Now + ":" + formatter(state, exception);
+            var msg = DateTime.Now + ":  " + formatter(state, exception);
+
+            if (logLevel == LogLevel.Error)
+            {
+                File.AppendAllText(_errorsPath, msg + Environment.NewLine);
+            }
 
             File.AppendAllText(_allLogsPath, msg + Environment.NewLine);
-           // Console.WriteLine($"{msg}");
+            // Console.WriteLine($"{msg}");
         }
     }
 }

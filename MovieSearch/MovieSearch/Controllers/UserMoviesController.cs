@@ -8,12 +8,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using MovieSearch.Data;
 using MovieSearch.Models;
 using MovieSearch.ViewModels.UserMovies;
 
-namespace MovieSearch.ViewModels
+namespace MovieSearch.Controllers
 {
     [Authorize]
     public class UserMoviesController : Controller
@@ -39,18 +40,19 @@ namespace MovieSearch.ViewModels
         }
 
         private readonly ApplicationDbContext _context;
-
+        private readonly IStringLocalizer<UserMoviesController> _localizer;
         private readonly ILogger<UserMoviesController> _logger;
-
         private readonly UserManager<ApplicationUser> _userManager;
 
         public UserMoviesController(
             ILogger<UserMoviesController> logger,
             ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IStringLocalizer<UserMoviesController> localizer)
         {
             _logger = logger;
             _context = context;
+            _localizer = localizer;
             _userManager = userManager;
         }
 
@@ -168,7 +170,7 @@ namespace MovieSearch.ViewModels
             {
                 userProfile.FavouriteMovies.Add(new UserFavourites { MovieId = favMovie.Id, ProfileId = userProfile.Id });
 
-                isFavourite = "In Favourites";
+                isFavourite = _localizer["In Favourites"];
 
                 _logger.LogInformation("User `{0}` has added Movie {1} or fav {2} to his favourites", userId, id, favMovie.Id);
             }
@@ -176,8 +178,7 @@ namespace MovieSearch.ViewModels
             {
                 var userFavMovie = userProfile.FavouriteMovies.FirstOrDefault(m => m.MovieId == favMovie.Id);
                 userProfile.FavouriteMovies.Remove(userFavMovie);
-                isFavourite = "Add Favourite ";
-
+                isFavourite = _localizer["Add Favourite"];
                 _logger.LogInformation("User `{0}` has removed Movie {1} or fav {2} from his favourites", userId, id, favMovie.Id);
             }
 
