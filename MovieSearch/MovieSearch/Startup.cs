@@ -56,6 +56,13 @@ namespace MovieSearch
                 .AddDefaultTokenProviders()
                 .AddDefaultUI();
 
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = Configuration["Authentication:Google:ClientId"];
+                    options.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                });
+
 
             services.AddControllersWithViews()
                 .AddMvcLocalization(
@@ -118,8 +125,10 @@ namespace MovieSearch
 
             app.UseRequestLocalization();
 
+
             app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {
